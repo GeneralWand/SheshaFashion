@@ -1,0 +1,7 @@
+{
+  "name": "SheshaFashion",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
