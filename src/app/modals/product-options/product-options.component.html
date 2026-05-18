@@ -1,0 +1,100 @@
+<ion-header>
+  <ion-toolbar color="dark">
+    <ion-title>{{product.name}}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="product-image">
+    <img [src]="product.images?.length ? product.images[0] : placeholderProduct" [alt]="product.name">
+  </div>
+  
+  <div class="product-info">
+    <h2>{{product.name}}</h2>
+    <p class="description">{{product.description}}</p>
+    
+    <div class="price">
+      <span class="current-price" [class.discounted]="product.discount_price">
+        {{(product.discount_price || product.price) | currency}}
+      </span>
+      <span class="original-price" *ngIf="product.discount_price">
+        {{product.price | currency}}
+      </span>
+    </div>
+    
+    <!-- Variants -->
+    <div *ngIf="variants.length > 0">
+      <div class="variant-section" *ngIf="uniqueSizes.length > 0">
+        <h3>Select Size</h3>
+        <div class="size-options">
+          <div *ngFor="let size of uniqueSizes" 
+            class="size-option"
+            [class.selected]="selectedSize === size"
+            [class.out-of-stock]="isSizeOutOfStock(size)"
+            (click)="selectSize(size)">
+            {{size}}
+          </div>
+        </div>
+      </div>
+      
+      <div class="variant-section" *ngIf="uniqueColors.length > 0">
+        <h3>Select Color</h3>
+        <div class="color-options">
+          <div *ngFor="let color of uniqueColors" 
+            class="color-option"
+            [class.selected]="selectedColor === color"
+            [class.out-of-stock]="isColorOutOfStock(color)"
+            (click)="selectColor(color)">
+            <div class="color-circle" [style.backgroundColor]="getColorCode(color)"></div>
+            <span>{{color}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Quantity -->
+    <div class="quantity-section">
+      <h3>Quantity</h3>
+      <div class="quantity-selector">
+        <ion-button fill="outline" (click)="decreaseQuantity()" [disabled]="quantity <= 1">
+          <ion-icon name="remove"></ion-icon>
+        </ion-button>
+        <span class="quantity">{{quantity}}</span>
+        <ion-button fill="outline" (click)="increaseQuantity()" [disabled]="!isSelectedInStock()">
+          <ion-icon name="add"></ion-icon>
+        </ion-button>
+      </div>
+    </div>
+    
+    <!-- Special Instructions -->
+    <div class="note-section">
+      <h3>Special Instructions (Optional)</h3>
+      <ion-textarea 
+        [(ngModel)]="note"
+        placeholder="e.g., Leave at door, call when arrived, etc."
+        rows="2">
+      </ion-textarea>
+    </div>
+  </div>
+</ion-content>
+
+<ion-footer>
+  <div class="footer-content">
+    <div class="total-price">
+      Total: {{(product.discount_price || product.price) * quantity | currency}}
+    </div>
+    <ion-button 
+      color="danger" 
+      expand="block" 
+      (click)="addToCart()"
+      [disabled]="!isSelectedInStock()"
+      class="add-btn">
+      Add to Cart
+    </ion-button>
+  </div>
+</ion-footer>

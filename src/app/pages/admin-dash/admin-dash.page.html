@@ -1,0 +1,321 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Admin Dashboard</ion-title>
+    <ion-buttons slot="end">
+      <ion-button>
+        <ion-icon name="notifications-outline"></ion-icon>
+      </ion-button>
+      <ion-button>
+        <ion-icon name="person-circle-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <!-- Tabs -->
+  <ion-segment [(ngModel)]="activeTab">
+    <ion-segment-button value="pending">
+      <ion-label>Pending Approvals</ion-label>
+      <ion-badge *ngIf="pendingCount > 0" color="danger">{{ pendingCount }}</ion-badge>
+    </ion-segment-button>
+    <ion-segment-button value="vendors">
+      <ion-label>Vendors</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="drivers">
+      <ion-label>Drivers</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="stores">
+      <ion-label>Stores</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="analytics">
+      <ion-label>Analytics</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+
+  <!-- Pending Approvals Tab -->
+  <div *ngIf="activeTab === 'pending'">
+    <!-- Pending Vendors -->
+    <ion-card *ngIf="pendingVendors.length > 0">
+      <ion-card-header>
+        <ion-card-title>Pending Vendor Approvals</ion-card-title>
+        <ion-card-subtitle>{{ pendingVendors.length }} vendors waiting for approval</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        <div *ngFor="let vendor of pendingVendors" class="pending-item">
+          <ion-item lines="full">
+            <ion-avatar slot="start">
+              <ion-icon name="business-outline"></ion-icon>
+            </ion-avatar>
+            <ion-label>
+              <h2>{{ vendor.storeName }}</h2>
+              <p>Email: {{ vendor.businessEmail }}</p>
+              <p>Phone: {{ vendor.businessPhone }}</p>
+              <p>Submitted: {{ vendor.createdDate | date }}</p>
+            </ion-label>
+            <ion-buttons slot="end">
+              <ion-button (click)="viewVendorDetails(vendor)" fill="clear">
+                <ion-icon name="eye"></ion-icon>
+              </ion-button>
+              <ion-button (click)="approveVendor(vendor)" color="success" fill="clear">
+                <ion-icon name="checkmark-circle"></ion-icon>
+              </ion-button>
+              <ion-button (click)="rejectVendor(vendor)" color="danger" fill="clear">
+                <ion-icon name="close-circle"></ion-icon>
+              </ion-button>
+            </ion-buttons>
+          </ion-item>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Pending Drivers -->
+    <ion-card *ngIf="pendingDrivers.length > 0">
+      <ion-card-header>
+        <ion-card-title>Pending Driver Approvals</ion-card-title>
+        <ion-card-subtitle>{{ pendingDrivers.length }} drivers waiting for approval</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        <div *ngFor="let driver of pendingDrivers" class="pending-item">
+          <ion-item lines="full">
+            <ion-avatar slot="start">
+              <ion-icon name="car-outline"></ion-icon>
+            </ion-avatar>
+            <ion-label>
+              <h2>{{ driver.fullName }}</h2>
+              <p>License: {{ driver.licenseNumber }}</p>
+              <p>Vehicle: {{ driver.vehicleModel }} ({{ driver.vehicleColor }})</p>
+              <p>Plate: {{ driver.plateNumber }}</p>
+            </ion-label>
+            <ion-buttons slot="end">
+              <ion-button (click)="viewDriverDetails(driver)" fill="clear">
+                <ion-icon name="eye"></ion-icon>
+              </ion-button>
+              <ion-button (click)="approveDriver(driver)" color="success" fill="clear">
+                <ion-icon name="checkmark-circle"></ion-icon>
+              </ion-button>
+              <ion-button (click)="rejectDriver(driver)" color="danger" fill="clear">
+                <ion-icon name="close-circle"></ion-icon>
+              </ion-button>
+            </ion-buttons>
+          </ion-item>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <!-- Vendors Tab -->
+  <div *ngIf="activeTab === 'vendors'">
+    <ion-searchbar [(ngModel)]="vendorSearchTerm" placeholder="Search vendors..." (ionInput)="filterVendors()"></ion-searchbar>
+    
+    <ion-card *ngFor="let vendor of filteredVendors">
+      <ion-card-header>
+        <ion-card-title>{{ vendor.storeName }}</ion-card-title>
+        <ion-card-subtitle>Status: {{ vendor.isApproved ? 'Approved' : 'Pending' }}</ion-card-subtitle>
+        <ion-buttons slot="end">
+          <ion-button (click)="toggleVendorStatus(vendor)" [color]="vendor.isApproved ? 'danger' : 'success'">
+            <ion-icon [name]="vendor.isApproved ? 'close-circle' : 'checkmark-circle'"></ion-icon>
+            {{ vendor.isApproved ? 'Deactivate' : 'Activate' }}
+          </ion-button>
+        </ion-buttons>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-grid>
+          <ion-row>
+            <ion-col size="6">
+              <p><strong>Email:</strong> {{ vendor.businessEmail }}</p>
+              <p><strong>Phone:</strong> {{ vendor.businessPhone }}</p>
+              <p><strong>Address:</strong> {{ vendor.businessAddress }}</p>
+            </ion-col>
+            <ion-col size="6">
+              <p><strong>Total Sales:</strong> R{{ vendor.totalSales || 0 }}</p>
+              <p><strong>Rating:</strong> {{ vendor.rating || 0 }} ★</p>
+              <p><strong>Commission Rate:</strong> {{ vendor.commissionRate }}%</p>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+
+        <!-- Stores under this vendor -->
+        <div class="vendor-stores">
+          <ion-item lines="none">
+            <ion-label>
+              <h3>Stores ({{ vendor.stores?.length || 0 }})</h3>
+            </ion-label>
+            <ion-button (click)="toggleVendorStores(vendor)" fill="clear" slot="end">
+              {{ expandedVendor === vendor.vendorId ? 'Hide' : 'View Stores' }}
+              <ion-icon [name]="expandedVendor === vendor.vendorId ? 'chevron-up' : 'chevron-down'"></ion-icon>
+            </ion-button>
+          </ion-item>
+          
+          <div *ngIf="expandedVendor === vendor.vendorId" class="store-list">
+            <ion-card *ngFor="let store of vendor.stores" class="store-card-mini">
+              <ion-card-header>
+                <ion-card-title>{{ store.name }}</ion-card-title>
+                <ion-badge [color]="store.status === 'open' ? 'success' : 'danger'">{{ store.status }}</ion-badge>
+              </ion-card-header>
+              <ion-card-content>
+                <p><strong>Category:</strong> {{ store.category }}</p>
+                <p><strong>Delivery Fee:</strong> R{{ store.deliveryFee }}</p>
+                <p><strong>Min Order:</strong> R{{ store.minOrder }}</p>
+                <p><strong>Rating:</strong> {{ store.rating || 0 }} ★</p>
+                <ion-button (click)="toggleStoreStatus(store)" size="small" [color]="store.status === 'open' ? 'warning' : 'success'">
+                  {{ store.status === 'open' ? 'Close Store' : 'Open Store' }}
+                </ion-button>
+              </ion-card-content>
+            </ion-card>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <!-- Drivers Tab -->
+  <div *ngIf="activeTab === 'drivers'">
+    <ion-searchbar [(ngModel)]="driverSearchTerm" placeholder="Search drivers..." (ionInput)="filterDrivers()"></ion-searchbar>
+    
+    <ion-grid>
+      <ion-row>
+        <ion-col size="12" size-md="6" *ngFor="let driver of filteredDrivers">
+          <ion-card>
+            <ion-card-header>
+              <ion-card-title>{{ driver.fullName }}</ion-card-title>
+              <ion-card-subtitle>Status: {{ driver.isApproved ? 'Approved' : 'Pending' }}</ion-card-subtitle>
+              <ion-badge [color]="driver.isOnline ? 'success' : 'danger'" slot="end">
+                {{ driver.isOnline ? 'Online' : 'Offline' }}
+              </ion-badge>
+            </ion-card-header>
+            <ion-card-content>
+              <p><strong>Email:</strong> {{ driver.email }}</p>
+              <p><strong>Phone:</strong> {{ driver.phone }}</p>
+              <p><strong>Vehicle:</strong> {{ driver.vehicleModel }} ({{ driver.vehicleColor }})</p>
+              <p><strong>License Plate:</strong> {{ driver.plateNumber }}</p>
+              <p><strong>Total Deliveries:</strong> {{ driver.totalDeliveries || 0 }}</p>
+              <p><strong>Total Earnings:</strong> R{{ driver.totalEarnings || 0 }}</p>
+              <p><strong>Rating:</strong> {{ driver.rating || 0 }} ★</p>
+              
+              <div class="driver-actions">
+                <ion-button (click)="viewDriverDocuments(driver)" size="small" fill="outline">
+                  <ion-icon name="document"></ion-icon>
+                  View Documents
+                </ion-button>
+                <ion-button (click)="toggleDriverApproval(driver)" size="small" [color]="driver.isApproved ? 'danger' : 'success'">
+                  {{ driver.isApproved ? 'Suspend' : 'Approve' }}
+                </ion-button>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+
+  <!-- Stores Tab -->
+  <div *ngIf="activeTab === 'stores'">
+    <ion-searchbar [(ngModel)]="storeSearchTerm" placeholder="Search stores..." (ionInput)="filterStores()"></ion-searchbar>
+    
+    <ion-grid>
+      <ion-row>
+        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let store of filteredStores">
+          <ion-card>
+            <ion-card-header>
+              <ion-card-title>{{ store.name }}</ion-card-title>
+              <ion-card-subtitle>{{ store.category }}</ion-card-subtitle>
+              <ion-badge [color]="store.status === 'open' ? 'success' : 'danger'" slot="end">
+                {{ store.status }}
+              </ion-badge>
+            </ion-card-header>
+            <ion-card-content>
+              <p><strong>Vendor:</strong> {{ store.vendorName }}</p>
+              <p><strong>Address:</strong> {{ store.address }}</p>
+              <p><strong>Delivery Fee:</strong> R{{ store.deliveryFee }}</p>
+              <p><strong>Min Order:</strong> R{{ store.minOrder }}</p>
+              <p><strong>Rating:</strong> {{ store.rating || 0 }} ★ ({{ store.reviewCount || 0 }} reviews)</p>
+              <p><strong>Est. Delivery:</strong> {{ store.estimatedDeliveryTime }}</p>
+              
+              <ion-button expand="block" (click)="viewStoreDetails(store)" fill="outline" size="small">
+                Manage Store
+              </ion-button>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+
+  <!-- Analytics Tab -->
+  <div *ngIf="activeTab === 'analytics'">
+    <ion-grid>
+      <ion-row>
+        <ion-col size="12" size-md="6">
+          <ion-card>
+            <ion-card-header>
+              <ion-card-title>Revenue Overview</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <canvas #revenueChart></canvas>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+        <ion-col size="12" size-md="6">
+          <ion-card>
+            <ion-card-header>
+              <ion-card-title>Order Statistics</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <canvas #orderChart></canvas>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+      
+      <ion-row>
+        <ion-col size="12" size-md="4">
+          <ion-card class="stats-card">
+            <ion-card-content>
+              <div class="stats-number">{{ totalOrders }}</div>
+              <div class="stats-label">Total Orders</div>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+        <ion-col size="12" size-md="4">
+          <ion-card class="stats-card">
+            <ion-card-content>
+              <div class="stats-number">R{{ totalRevenue }}</div>
+              <div class="stats-label">Total Revenue</div>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+        <ion-col size="12" size-md="4">
+          <ion-card class="stats-card">
+            <ion-card-content>
+              <div class="stats-number">{{ activeUsers }}</div>
+              <div class="stats-label">Active Users</div>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+      
+      <ion-row>
+        <ion-col size="12">
+          <ion-card>
+            <ion-card-header>
+              <ion-card-title>Recent Activity</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <ion-list>
+                <ion-item *ngFor="let activity of recentActivities">
+                  <ion-icon [name]="activity.icon" slot="start"></ion-icon>
+                  <ion-label>
+                    <h3>{{ activity.title }}</h3>
+                    <p>{{ activity.description }}</p>
+                    <p class="activity-time">{{ activity.timestamp | date:'MMM d, h:mm a' }}</p>
+                  </ion-label>
+                </ion-item>
+              </ion-list>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+</ion-content>

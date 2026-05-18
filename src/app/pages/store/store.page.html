@@ -1,0 +1,135 @@
+<ion-header>
+  <ion-toolbar color="dark">
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{store?.name}}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="goToCart()">
+        <ion-icon name="cart-outline"></ion-icon>
+        <ion-badge color="danger" *ngIf="cartItemCount > 0">{{cartItemCount}}</ion-badge>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div *ngIf="store">
+    <!-- Store Header -->
+    <div class="store-header">
+      <div class="cover-image">
+        <img [src]="store.cover_image_url || placeholderStore" [alt]="store.name">
+        <div class="store-logo">
+          <img [src]="store.logo_url || placeholderStore" [alt]="store.name">
+        </div>
+      </div>
+      
+      <div class="store-info">
+        <h1>{{store.name}}</h1>
+        <div class="rating">
+          <ion-icon name="star"></ion-icon>
+          <span>{{store.rating}}</span>
+          <span class="review-count">({{store.review_count}} reviews)</span>
+        </div>
+        <p class="description">{{store.description}}</p>
+        
+        <div class="store-meta">
+          <div class="meta-item">
+            <ion-icon name="time-outline"></ion-icon>
+            <span>{{store.estimated_delivery_time}}</span>
+          </div>
+          <div class="meta-item">
+            <ion-icon name="cash-outline"></ion-icon>
+            <span>{{store.delivery_fee === 0 ? 'Free delivery' : 'R' + store.delivery_fee + ' delivery'}}</span>
+          </div>
+          <div class="meta-item">
+            <ion-icon name="alert-circle-outline"></ion-icon>
+            <span>Min. R{{store.min_order}}</span>
+          </div>
+        </div>
+        
+        <div class="store-hours" *ngIf="store.is_open">
+          <ion-icon name="time-outline"></ion-icon>
+          <span class="open">Open Now</span>
+          <span class="hours">{{getOpeningHours()}}</span>
+        </div>
+        <div class="store-hours closed" *ngIf="!store.is_open">
+          <ion-icon name="time-outline"></ion-icon>
+          <span class="closed-text">Closed</span>
+          <span class="hours">{{getOpeningHours()}}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cart Warning (if cart has different store) -->
+    <div class="cart-warning" *ngIf="cartStore && cartStore.store_id !== store.store_id">
+      <ion-icon name="alert-circle-outline"></ion-icon>
+      <div class="warning-content">
+        <strong>Your cart has items from {{cartStore.name}}</strong>
+        <p>Adding items from this store will clear your current cart</p>
+      </div>
+      <ion-button fill="clear" color="danger" (click)="clearCartAndContinue()">
+        Clear Cart
+      </ion-button>
+    </div>
+
+    <!-- Categories Tabs -->
+    <ion-segment [(ngModel)]="selectedCategory" (ionChange)="filterProducts()" class="category-tabs">
+      <ion-segment-button value="all">
+        <ion-label>All Items</ion-label>
+      </ion-segment-button>
+      <ion-segment-button *ngFor="let category of categories" [value]="category">
+        <ion-label>{{category}}</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+
+    <!-- Products Grid -->
+    <div class="products-grid">
+      <div
+        *ngFor="let product of filteredProducts"
+        class="product-card"
+        (click)="openProductDetail(product)">
+        <div class="product-image">
+          <img [src]="product.images && product.images[0] ? product.images[0] : placeholderProduct" [alt]="product.name">
+          <div class="discount-badge" *ngIf="product.discount_price">
+            -{{((product.price - product.discount_price) / product.price * 100).toFixed(0)}}%
+          </div>
+          <div class="availability-badge" *ngIf="!product.is_available">
+            <ion-icon name="close-circle-outline"></ion-icon>
+            Out of Stock
+          </div>
+        </div>
+        <div class="product-info">
+          <h3>{{product.name}}</h3>
+          <p class="product-description">{{product.description | slice:0:80}}{{product.description.length > 80 ? '...' : ''}}</p>
+          
+          <div class="price-section">
+            <span class="current-price" [class.discounted]="product.discount_price">
+              R{{(product.discount_price || product.price) | number:'1.2-2'}}
+            </span>
+            <span class="original-price" *ngIf="product.discount_price">
+              R{{product.price | number:'1.2-2'}}
+            </span>
+          </div>
+          
+          <div class="product-actions">
+            <ion-button 
+              fill="outline" 
+              size="small" 
+              color="danger"
+              (click)="showProductOptions(product); $event.stopPropagation()"
+              [disabled]="!product.is_available">
+              <ion-icon name="add-outline" slot="start"></ion-icon>
+              Add to Cart
+            </ion-button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-spinner">
+    <ion-spinner name="crescent"></ion-spinner>
+  </div>
+</ion-content>

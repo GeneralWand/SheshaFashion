@@ -1,0 +1,176 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Driver Dashboard</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="toggleOnlineStatus()">
+        <ion-icon [name]="isOnline ? 'radio-button-on' : 'radio-button-off'" slot="start"></ion-icon>
+        {{ isOnline ? 'Online' : 'Offline' }}
+      </ion-button>
+      <ion-button>
+        <ion-icon name="notifications-outline"></ion-icon>
+      </ion-button>
+      <ion-button>
+        <ion-icon name="person-circle-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <!-- Stats row -->
+  <div class="stats-grid">
+    <ion-card class="stat-card">
+      <ion-card-content>
+        <div class="stat-value">{{ stats.totalDeliveries }}</div>
+        <div class="stat-label">Total Deliveries</div>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card class="stat-card">
+      <ion-card-content>
+        <div class="stat-value">R{{ stats.totalEarnings | number:'1.0-0' }}</div>
+        <div class="stat-label">Total Earnings</div>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card class="stat-card">
+      <ion-card-content>
+        <div class="stat-value">{{ stats.rating | number:'1.1-1' }} ★</div>
+        <div class="stat-label">Rating</div>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card class="stat-card stat-card-today">
+      <ion-card-content>
+        <div class="stat-value">R{{ todayEarnings | number:'1.0-0' }}</div>
+        <div class="stat-label">Today's Earnings</div>
+        <div class="stat-sub">{{ completedDeliveriesToday }} today</div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <ion-card *ngIf="isOnline && availableOrders.length === 0">
+    <ion-card-content>
+      <p class="ion-text-center ion-color-medium">No new customer orders right now. New checkouts appear as <strong>pending</strong> until you accept.</p>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card *ngIf="!isOnline">
+    <ion-card-content>
+      <p class="ion-text-center ion-color-medium">Go <strong>Online</strong> to see pending orders waiting for a driver.</p>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Available Deliveries (pending — accept first, then store is auto-confirmed) -->
+  <ion-card *ngIf="isOnline && availableOrders.length > 0">
+    <ion-card-header>
+      <ion-card-title>Pending Orders — Accept First</ion-card-title>
+      <ion-card-subtitle>{{ availableOrders.length }} awaiting driver · store confirms automatically</ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+      <div *ngFor="let order of availableOrders" class="order-item">
+        <ion-item lines="full">
+          <ion-thumbnail slot="start">
+            <ion-icon name="fast-food-outline" size="large"></ion-icon>
+          </ion-thumbnail>
+          <ion-label>
+            <h2>{{ order.storeName }}</h2>
+            <p>Distance: {{ order.distance }} km</p>
+            <p>Est. Time: {{ order.estimatedTime }} min</p>
+            <p>Earnings: R{{ order.earnings }}</p>
+          </ion-label>
+          <ion-button (click)="acceptOrder(order)" fill="solid" slot="end">
+            Accept
+          </ion-button>
+        </ion-item>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Active Deliveries -->
+  <ion-card *ngIf="activeDeliveries.length > 0">
+    <ion-card-header>
+      <ion-card-title>Active Deliveries</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <div *ngFor="let delivery of activeDeliveries" class="delivery-item">
+        <ion-item>
+          <ion-avatar slot="start">
+            <ion-icon name="location-outline"></ion-icon>
+          </ion-avatar>
+          <ion-label>
+            <h2>Order #{{ delivery.orderId }}</h2>
+            <p>Pickup: {{ delivery.pickupLocation }}</p>
+            <p>Delivery: {{ delivery.deliveryLocation }}</p>
+            <p>Status: {{ delivery.status }}</p>
+          </ion-label>
+          <ion-button (click)="viewDeliveryDetails(delivery)" fill="clear" slot="end">
+            <ion-icon name="chevron-forward"></ion-icon>
+          </ion-button>
+        </ion-item>
+
+        <div class="delivery-progress">
+          <div class="progress-steps">
+            <div class="progress-step" [class.active]="delivery.status === 'assigned' || delivery.status === 'accepted' || delivery.status === 'picked_up' || delivery.status === 'delivered'">
+              <ion-icon name="checkmark-circle"></ion-icon>
+              <span>Assigned</span>
+            </div>
+            <div class="progress-step" [class.active]="delivery.status === 'accepted' || delivery.status === 'picked_up' || delivery.status === 'delivered'">
+              <ion-icon name="car"></ion-icon>
+              <span>Accepted</span>
+            </div>
+            <div class="progress-step" [class.active]="delivery.status === 'picked_up' || delivery.status === 'delivered'">
+              <ion-icon name="cube"></ion-icon>
+              <span>Picked Up</span>
+            </div>
+            <div class="progress-step" [class.active]="delivery.status === 'delivered'">
+              <ion-icon name="flag"></ion-icon>
+              <span>Delivered</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="delivery-actions" *ngIf="delivery.status === 'assigned'">
+          <ion-button expand="block" (click)="acceptDelivery(delivery)" color="success">
+            Accept Delivery
+          </ion-button>
+        </div>
+        <div class="delivery-actions" *ngIf="delivery.status === 'accepted'">
+          <ion-button expand="block" (click)="markAsPickedUp(delivery)" color="primary">
+            Mark as Picked Up
+          </ion-button>
+        </div>
+        <div class="delivery-actions" *ngIf="delivery.status === 'picked_up'">
+          <ion-button expand="block" (click)="markAsDelivered(delivery)" color="success">
+            Mark as Delivered
+          </ion-button>
+        </div>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Delivery History -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>{{ showAllDeliveryHistory ? 'Delivery History' : 'Recent Deliveries' }}</ion-card-title>
+      <ion-button fill="clear" slot="end" (click)="viewAllHistory()">
+        {{ showAllDeliveryHistory ? 'Show Less' : 'View All' }}
+      </ion-button>
+    </ion-card-header>
+    <ion-card-content>
+      <p *ngIf="deliveryHistory.length === 0" class="ion-text-center ion-color-medium">No completed deliveries yet.</p>
+      <ion-list *ngIf="deliveryHistory.length > 0">
+        <ion-item *ngFor="let history of displayedDeliveryHistory" lines="full">
+          <ion-label>
+            <h3>Order #{{ history.orderId }}</h3>
+            <p>{{ history.storeName }} • {{ history.date | date:'MMM d, h:mm a' }}</p>
+            <p class="earnings">R{{ history.earnings }}</p>
+          </ion-label>
+          <ion-badge [color]="history.status === 'delivered' ? 'success' : 'warning'" slot="end">
+            {{ history.status }}
+          </ion-badge>
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

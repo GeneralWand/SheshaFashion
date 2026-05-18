@@ -1,0 +1,65 @@
+<ion-header>
+  <ion-toolbar color="dark">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ product?.name || 'Product' }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="goToCart()">
+        <ion-icon name="cart-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div *ngIf="loading" class="state-center">
+    <ion-spinner name="crescent"></ion-spinner>
+  </div>
+
+  <div *ngIf="!loading && !product" class="state-center">
+    <p>We could not load this product.</p>
+    <ion-button color="danger" routerLink="/home">Back to home</ion-button>
+  </div>
+
+  <div *ngIf="!loading && product" class="detail-wrap">
+    <div class="gallery">
+      <div class="main-img">
+        <img [src]="mainImageSrc()" [alt]="product.name" />
+      </div>
+      <div class="thumbs" *ngIf="product.images.length > 1">
+        <button
+          type="button"
+          *ngFor="let img of product.images; let i = index"
+          [class.active]="i === selectedImageIndex"
+          (click)="selectedImageIndex = i">
+          <img [src]="img" [alt]="product.name" />
+        </button>
+      </div>
+    </div>
+
+    <div class="detail-body ion-padding" *ngIf="store">
+      <p class="store-link" (click)="goToStore()">
+        <ion-icon name="storefront-outline"></ion-icon>
+        {{ store.name }}
+      </p>
+    </div>
+
+    <div class="detail-body ion-padding">
+      <h1>{{ product.name }}</h1>
+      <div class="price-row">
+        <span class="current" *ngIf="!product.discount_price">R{{ product.price | number:'1.2-2' }}</span>
+        <ng-container *ngIf="product.discount_price">
+          <span class="current sale">R{{ product.discount_price | number:'1.2-2' }}</span>
+          <span class="was">R{{ product.price | number:'1.2-2' }}</span>
+        </ng-container>
+      </div>
+      <p class="desc">{{ product.description }}</p>
+
+      <ion-button expand="block" color="danger" (click)="quickAdd()" [disabled]="!product.is_available">
+        <ion-icon name="bag-add-outline" slot="start"></ion-icon>
+        {{ product.is_available ? (product.variants?.length ? 'Choose options' : 'Add to cart') : 'Unavailable' }}
+      </ion-button>
+    </div>
+  </div>
+</ion-content>

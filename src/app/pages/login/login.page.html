@@ -1,0 +1,73 @@
+<ion-content class="login-content">
+  <div class="logo-container">
+    <div class="logo">
+      <h1>Shesha</h1>
+      <p>Fashion</p>
+    </div>
+  </div>
+
+  <div class="form-container">
+    <h2>Welcome Back</h2>
+    <p class="subtitle">Sign in to continue shopping</p>
+
+    <form (ngSubmit)="login()" #loginForm="ngForm">
+      <ion-item lines="none" class="form-item">
+        <ion-label position="floating">Email Address</ion-label>
+        <ion-input 
+          type="email" 
+          [(ngModel)]="credentials.email" 
+          name="email"
+          required
+          email>
+        </ion-input>
+      </ion-item>
+
+      <ion-item lines="none" class="form-item">
+        <ion-label position="floating">Password</ion-label>
+        <ion-input 
+          type="password" 
+          [(ngModel)]="credentials.password" 
+          name="password"
+          required>
+        </ion-input>
+      </ion-item>
+
+      <div class="forgot-password">
+        <ion-button fill="clear" size="small" (click)="forgotPassword()">
+          Forgot Password?
+        </ion-button>
+      </div>
+
+      <ion-button 
+        type="submit" 
+        expand="block" 
+        color="danger" 
+        class="login-btn"
+        [disabled]="loginForm.invalid">
+        Sign In
+      </ion-button>
+
+      <div class="divider">
+        <span>or</span>
+      </div>
+
+      <ion-button 
+        expand="block" 
+        fill="outline" 
+        color="dark" 
+        class="social-btn"
+        (click)="loginWithGoogle()">
+        <ion-icon name="logo-google" slot="start"></ion-icon>
+        Continue with Google
+      </ion-button>
+
+      <div class="register-link">
+        <p>Don't have an account? 
+          <ion-button fill="clear" color="danger" (click)="goToRegister()">
+            Sign Up
+          </ion-button>
+        </p>
+      </div>
+    </form>
+  </div>
+</ion-content>

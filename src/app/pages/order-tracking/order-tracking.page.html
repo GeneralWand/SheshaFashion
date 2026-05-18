@@ -1,0 +1,86 @@
+<ion-header>
+  <ion-toolbar color="dark">
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title>Track Order</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div *ngIf="order" class="tracking-container">
+    <!-- Order Info -->
+    <div class="order-info">
+      <h3>Order #{{order.id.slice(-8)}}</h3>
+      <p>Placed on {{order.createdAt | date:'medium'}}</p>
+      <div class="order-status-badge" [class]="order.status">
+        {{order.status | uppercase}}
+      </div>
+    </div>
+
+    <!-- Tracking Timeline -->
+    <div class="tracking-timeline">
+      <div *ngFor="let event of trackingEvents; let i = index" 
+           class="timeline-step" 
+           [class.completed]="isEventCompleted(event.status)"
+           [class.current]="isCurrentEvent(event.status)">
+        <div class="timeline-icon">
+          <ion-icon [name]="getEventIcon(event.status)"></ion-icon>
+        </div>
+        <div class="timeline-content">
+          <h4>{{getEventTitle(event.status)}}</h4>
+          <p>{{event.description}}</p>
+          <small *ngIf="event.created_at">{{event.created_at | date:'short'}}</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delivery Info -->
+    <div class="delivery-info">
+      <div class="info-card">
+        <ion-icon name="location-outline"></ion-icon>
+        <div class="info-content">
+          <h4>Delivery Address</h4>
+          <p>{{order.address.fullName}}</p>
+          <p>{{order.address.addressLine1}}</p>
+          <p *ngIf="order.address.addressLine2">{{order.address.addressLine2}}</p>
+          <p>{{order.address.city}}, {{order.address.state}} - {{order.address.zipCode}}</p>
+          <p>Phone: {{order.address.phone}}</p>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <ion-icon name="calendar-outline"></ion-icon>
+        <div class="info-content">
+          <h4>Estimated Delivery</h4>
+          <p>{{order.estimatedDelivery | date:'fullDate'}}</p>
+          <p>{{order.estimatedDelivery | date:'shortTime'}}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Order Items -->
+    <div class="order-items">
+      <h4>Items in this order</h4>
+      <div *ngFor="let item of order.items" class="order-item">
+        <img [src]="item.product?.images?.length ? item.product.images[0] : placeholderProduct" [alt]="item.product?.name || 'Product'">
+        <div class="item-details">
+          <h5>{{item.product?.name || 'Product'}}</h5>
+          <p class="item-variant" *ngIf="item.size?.name && item.color?.name">{{item.size.name}} / {{item.color.name}}</p>
+          <p class="item-quantity">Qty: {{item.quantity}}</p>
+        </div>
+        <div class="item-price">
+          {{item.price * item.quantity | currency}}
+        </div>
+      </div>
+    </div>
+
+    <!-- Support Button -->
+    <div class="support-section">
+      <ion-button fill="outline" color="danger" expand="block" (click)="contactSupport()">
+        <ion-icon name="chatbubble-outline" slot="start"></ion-icon>
+        Need Help? Contact Support
+      </ion-button>
+    </div>
+  </div>
+</ion-content>

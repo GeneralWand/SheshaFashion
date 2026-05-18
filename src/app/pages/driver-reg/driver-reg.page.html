@@ -1,0 +1,207 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title>Become a Driver</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <form [formGroup]="driverRegForm" (ngSubmit)="registerDriver()">
+    <!-- Progress Steps -->
+    <div class="progress-steps">
+      <div class="step" [class.active]="currentStep === 1">
+        <div class="step-number">1</div>
+        <div class="step-label">Personal Info</div>
+      </div>
+      <div class="step-line"></div>
+      <div class="step" [class.active]="currentStep === 2">
+        <div class="step-number">2</div>
+        <div class="step-label">License & Documents</div>
+      </div>
+      <div class="step-line"></div>
+      <div class="step" [class.active]="currentStep === 3">
+        <div class="step-number">3</div>
+        <div class="step-label">Vehicle Info</div>
+      </div>
+    </div>
+
+    <!-- Step 1: Personal Information -->
+    <div *ngIf="currentStep === 1" class="step-content">
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>Personal Information</ion-card-title>
+          <ion-card-subtitle>Please provide your personal details</ion-card-subtitle>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-item>
+            <ion-label position="floating">Full Name *</ion-label>
+            <ion-input formControlName="fullName" type="text"></ion-input>
+          </ion-item>
+          <div class="error-message" *ngIf="driverRegForm.get('fullName')?.invalid && driverRegForm.get('fullName')?.touched">
+            Full name is required
+          </div>
+
+          <ion-item>
+            <ion-label position="floating">Email Address *</ion-label>
+            <ion-input formControlName="email" type="email"></ion-input>
+          </ion-item>
+          <div class="error-message" *ngIf="driverRegForm.get('email')?.invalid && driverRegForm.get('email')?.touched">
+            Valid email is required
+          </div>
+
+          <ion-item>
+            <ion-label position="floating">Phone Number *</ion-label>
+            <ion-input formControlName="phone" type="tel"></ion-input>
+          </ion-item>
+          <div class="error-message" *ngIf="driverRegForm.get('phone')?.invalid && driverRegForm.get('phone')?.touched">
+            Phone number is required
+          </div>
+
+          <ion-item>
+            <ion-label position="floating">Password *</ion-label>
+            <ion-input formControlName="password" type="password"></ion-input>
+          </ion-item>
+          <div class="error-message" *ngIf="driverRegForm.get('password')?.invalid && driverRegForm.get('password')?.touched">
+            Password must be at least 6 characters
+          </div>
+
+          <ion-item>
+            <ion-label position="floating">Confirm Password *</ion-label>
+            <ion-input formControlName="confirmPassword" type="password"></ion-input>
+          </ion-item>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+    <!-- Step 2: License & Documents -->
+    <div *ngIf="currentStep === 2" class="step-content">
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>Driver's License Information</ion-card-title>
+          <ion-card-subtitle>Valid driver's license required</ion-card-subtitle>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-item>
+            <ion-label position="floating">Driver's License Number *</ion-label>
+            <ion-input formControlName="licenseNumber" type="text"></ion-input>
+          </ion-item>
+          <div class="error-message" *ngIf="driverRegForm.get('licenseNumber')?.invalid && driverRegForm.get('licenseNumber')?.touched">
+            License number is required
+          </div>
+
+          <ion-item>
+            <ion-label position="floating">License Expiry Date *</ion-label>
+            <ion-input formControlName="licenseExpiry" type="date"></ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label>Upload License Photo *</ion-label>
+            <ion-button (click)="uploadLicensePhoto()" expand="block" fill="outline">
+              <ion-icon name="camera" slot="start"></ion-icon>
+              Upload Photo
+            </ion-button>
+          </ion-item>
+          <div *ngIf="licensePhotoUrl" class="document-preview">
+            <img [src]="licensePhotoUrl" alt="License Photo">
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>Background Check Consent</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-item>
+            <ion-label class="ion-text-wrap">I consent to a background check as part of the driver application process</ion-label>
+            <ion-checkbox formControlName="backgroundCheckConsent" slot="start"></ion-checkbox>
+          </ion-item>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+    <!-- Step 3: Vehicle Information -->
+    <div *ngIf="currentStep === 3" class="step-content">
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>Vehicle Information</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-item>
+            <ion-label position="floating">Vehicle Type *</ion-label>
+            <ion-select formControlName="vehicleType" interface="action-sheet">
+              <ion-select-option value="car">Car</ion-select-option>
+              <ion-select-option value="motorcycle">Motorcycle</ion-select-option>
+              <ion-select-option value="scooter">Scooter</ion-select-option>
+              <ion-select-option value="bicycle">Bicycle</ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="floating">Vehicle Model *</ion-label>
+            <ion-input formControlName="vehicleModel" type="text"></ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="floating">Vehicle Color *</ion-label>
+            <ion-input formControlName="vehicleColor" type="text"></ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="floating">License Plate Number *</ion-label>
+            <ion-input formControlName="plateNumber" type="text"></ion-input>
+          </ion-item>
+          <div class="error-message" *ngIf="driverRegForm.get('plateNumber')?.invalid && driverRegForm.get('plateNumber')?.touched">
+            License plate is required
+          </div>
+
+          <ion-item>
+            <ion-label>Upload Vehicle Registration *</ion-label>
+            <ion-button (click)="uploadVehicleRegistration()" expand="block" fill="outline">
+              <ion-icon name="document" slot="start"></ion-icon>
+              Upload Document
+            </ion-button>
+          </ion-item>
+          <div *ngIf="vehicleRegUrl" class="document-preview">
+            <img *ngIf="vehicleRegUrl.startsWith('data:image')" [src]="vehicleRegUrl" alt="Vehicle Registration">
+            <ion-note *ngIf="vehicleRegUrl.startsWith('data:application/pdf')" color="medium">PDF document attached.</ion-note>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>Stores you deliver for</ion-card-title>
+          <ion-card-subtitle>Select one or more open stores — you’ll see delivery offers from those stores once they confirm orders</ion-card-subtitle>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-note *ngIf="storeChoices.length === 0" color="medium">Loading stores…</ion-note>
+          <ion-list *ngIf="storeChoices.length > 0">
+            <ion-item *ngFor="let s of storeChoices" button detail="false" (click)="toggleStoreChoice(s)">
+              <ion-label>{{ s.name }}</ion-label>
+              <ion-checkbox slot="end" [(ngModel)]="s.selected" (click)="$event.stopPropagation()"></ion-checkbox>
+            </ion-item>
+          </ion-list>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+    <!-- Navigation Buttons -->
+    <div class="navigation-buttons">
+      <ion-button *ngIf="currentStep > 1" (click)="previousStep()" fill="outline">
+        <ion-icon name="arrow-back" slot="start"></ion-icon>
+        Previous
+      </ion-button>
+      <ion-button *ngIf="currentStep < 3" (click)="nextStep()" expand="block">
+        Next
+        <ion-icon name="arrow-forward" slot="end"></ion-icon>
+      </ion-button>
+      <ion-button *ngIf="currentStep === 3" type="submit" expand="block" [disabled]="!driverRegForm.valid">
+        Submit Application
+        <ion-icon name="checkmark" slot="end"></ion-icon>
+      </ion-button>
+    </div>
+  </form>
+</ion-content>

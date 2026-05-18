@@ -1,0 +1,155 @@
+<ion-header>
+  <ion-toolbar color="dark">
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title>My Cart</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="clearCart()" [disabled]="!cart?.items || cart?.items?.length === 0">
+        <ion-icon name="trash-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Loading your cart...</p>
+  </div>
+
+  <!-- Empty Cart -->
+  <div *ngIf="!loading && (!cart || !cart.items || cart.items.length === 0)" class="empty-cart">
+    <ion-icon name="bag-outline"></ion-icon>
+    <h2>Your cart is empty</h2>
+    <p>Looks like you haven't added any items yet</p>
+    <ion-button color="danger" (click)="continueShopping()">
+      <ion-icon name="arrow-back-outline" slot="start"></ion-icon>
+      Continue Shopping
+    </ion-button>
+  </div>
+
+  <!-- Cart with Items -->
+  <div *ngIf="!loading && cart && cart.items && cart.items.length > 0" class="cart-container">
+    <!-- Store Info -->
+    <div class="store-info" (click)="goToStore()" *ngIf="cartStore">
+      <div class="store-logo" *ngIf="cartStore.logo_url">
+        <img [src]="cartStore.logo_url" [alt]="cartStore.name">
+      </div>
+      <div class="store-details">
+        <h3>{{cartStore.name}}</h3>
+        <div class="store-meta">
+          <span class="delivery-time">
+            <ion-icon name="time-outline"></ion-icon>
+            {{cartStore.estimated_delivery_time}}
+          </span>
+          <span class="delivery-fee">
+            <ion-icon name="cash-outline"></ion-icon>
+            {{cartStore.delivery_fee === 0 ? 'Free delivery' : 'R' + cartStore.delivery_fee + ' delivery'}}
+          </span>
+        </div>
+      </div>
+      <ion-icon name="chevron-forward-outline" class="arrow-icon"></ion-icon>
+    </div>
+
+    <!-- Cart Items -->
+    <div class="cart-items">
+      <div *ngFor="let item of cart.items" class="cart-item">
+        <div class="item-image">
+          <img [src]="item.product.images && item.product.images[0] ? item.product.images[0] : 'assets/img/placeholder-product.svg'" [alt]="item.product.name">
+        </div>
+        
+        <div class="item-details">
+          <div class="item-header">
+            <h4>{{item.product.name}}</h4>
+            <span class="item-price">R{{getItemTotal(item) | number:'1.2-2'}}</span>
+          </div>
+          
+          <p class="item-description">{{item.product.description | slice:0:60}}</p>
+          
+          <div class="item-variant" *ngIf="getVariantText(item)">
+            <ion-icon name="options-outline"></ion-icon>
+            <span>{{getVariantText(item)}}</span>
+          </div>
+          
+          <div class="item-actions">
+            <div class="quantity-selector">
+              <ion-button 
+                fill="outline" 
+                size="small" 
+                (click)="updateQuantity(item, item.quantity - 1)"
+                [disabled]="item.quantity <= 1">
+                <ion-icon name="remove-outline"></ion-icon>
+              </ion-button>
+              <span class="quantity">{{item.quantity}}</span>
+              <ion-button 
+                fill="outline" 
+                size="small" 
+                (click)="updateQuantity(item, item.quantity + 1)">
+                <ion-icon name="add-outline"></ion-icon>
+              </ion-button>
+            </div>
+            
+            <ion-button 
+              fill="clear" 
+              color="danger" 
+              size="small"
+              (click)="removeItem(item)">
+              <ion-icon name="trash-outline"></ion-icon>
+              Remove
+            </ion-button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Order Summary -->
+    <div class="order-summary">
+      <h3>Order Summary</h3>
+      
+      <div class="summary-row">
+        <span>Subtotal</span>
+        <span>R{{cart.subtotal | number:'1.2-2'}}</span>
+      </div>
+      
+      <div class="summary-row">
+        <span>Delivery Fee</span>
+        <span>
+          <span *ngIf="cart.delivery_fee === 0">Free</span>
+          <span *ngIf="cart.delivery_fee > 0">R{{cart.delivery_fee | number:'1.2-2'}}</span>
+        </span>
+      </div>
+      
+      <div class="summary-divider"></div>
+      
+      <div class="summary-row total">
+        <span>Total</span>
+        <span>R{{cart.total | number:'1.2-2'}}</span>
+      </div>
+      
+      <div class="minimum-order-warning" *ngIf="cartStore && cart.subtotal < cartStore.min_order">
+        <ion-icon name="alert-circle-outline"></ion-icon>
+        <span>Minimum order amount is R{{cartStore.min_order}}. Add R{{cartStore.min_order - cart.subtotal | number:'1.2-2'}} more</span>
+      </div>
+    </div>
+
+    <!-- Checkout Button -->
+    <div class="checkout-section">
+      <ion-button 
+        expand="block" 
+        color="danger" 
+        (click)="proceedToCheckout()"
+        [disabled]="!cartStore?.is_open || (cartStore && cart.subtotal < cartStore.min_order)">
+        Proceed to Checkout
+      </ion-button>
+      
+      <ion-button 
+        expand="block" 
+        fill="clear" 
+        (click)="continueShopping()">
+        Continue Shopping
+      </ion-button>
+    </div>
+  </div>
+</ion-content>

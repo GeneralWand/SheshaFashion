@@ -1,0 +1,117 @@
+<ion-content class="register-content">
+  <div class="header">
+    <ion-button fill="clear" (click)="goBack()">
+      <ion-icon name="arrow-back-outline"></ion-icon>
+    </ion-button>
+  </div>
+
+  <div class="form-container">
+    <h2>Create Account</h2>
+    <p class="subtitle">Join Shesha Fashion and start shopping</p>
+
+    <form (ngSubmit)="register()" #registerForm="ngForm">
+      <ion-item lines="none" class="form-item">
+        <ion-label position="floating">First Name</ion-label>
+        <ion-input 
+          type="text" 
+          [(ngModel)]="userData.firstName" 
+          name="firstName"
+          required>
+        </ion-input>
+      </ion-item>
+
+      <ion-item lines="none" class="form-item">
+        <ion-label position="floating">Last Name</ion-label>
+        <ion-input 
+          type="text" 
+          [(ngModel)]="userData.lastName" 
+          name="lastName"
+          required>
+        </ion-input>
+      </ion-item>
+
+      <ion-item lines="none" class="form-item">
+        <ion-label position="floating">Email Address</ion-label>
+        <ion-input 
+          type="email" 
+          [(ngModel)]="userData.email" 
+          name="email"
+          required
+          email>
+        </ion-input>
+      </ion-item>
+
+      <ion-item lines="none" class="form-item">
+        <ion-label position="floating">Phone Number</ion-label>
+        <ion-input 
+          type="tel" 
+          [(ngModel)]="userData.phone" 
+          name="phone"
+          required>
+        </ion-input>
+      </ion-item>
+
+      <ion-item lines="none" class="form-item">
+        <ion-label position="floating">Password</ion-label>
+        <ion-input 
+          type="password" 
+          [(ngModel)]="userData.password" 
+          name="password"
+          required
+          minlength="6">
+        </ion-input>
+        <ion-text color="danger" *ngIf="registerForm.controls['password']?.touched && registerForm.controls['password']?.errors?.['minlength']">
+          Password must be at least 6 characters
+        </ion-text>
+      </ion-item>
+
+      <ion-item lines="none" class="form-item">
+        <ion-label position="floating">Confirm Password</ion-label>
+        <ion-input 
+          type="password" 
+          [(ngModel)]="confirmPassword" 
+          name="confirmPassword"
+          required>
+        </ion-input>
+      </ion-item>
+
+      <div class="terms">
+        <ion-checkbox [(ngModel)]="acceptTerms" name="terms"></ion-checkbox>
+        <ion-label>
+          I agree to the <strong>Terms of Service</strong> and <strong>Privacy Policy</strong>
+        </ion-label>
+      </div>
+
+      <ion-button 
+        type="submit" 
+        expand="block" 
+        color="danger" 
+        class="register-btn"
+        [disabled]="registerForm.invalid || !acceptTerms || passwordsMismatch()">
+        Create Account
+      </ion-button>
+
+      <div class="divider">
+        <span>or</span>
+      </div>
+
+      <ion-button 
+        expand="block" 
+        fill="outline" 
+        color="dark" 
+        class="social-btn"
+        (click)="registerWithGoogle()">
+        <ion-icon name="logo-google" slot="start"></ion-icon>
+        Sign up with Google
+      </ion-button>
+
+      <div class="login-link">
+        <p>Already have an account? 
+          <ion-button fill="clear" color="danger" (click)="goToLogin()">
+            Sign In
+          </ion-button>
+        </p>
+      </div>
+    </form>
+  </div>
+</ion-content>

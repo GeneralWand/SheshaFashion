@@ -1,0 +1,106 @@
+<ion-header>
+  <ion-toolbar color="dark">
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title>My Profile</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="editProfile()">
+        <ion-icon name="create-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div *ngIf="profile" class="profile-container">
+    <!-- Profile Header -->
+    <div class="profile-header">
+      <div class="avatar-container">
+        <div class="avatar" [style.backgroundImage]="'url(' + (profile.avatar_url || 'assets/default-avatar.png') + ')'">
+          <div class="avatar-overlay" (click)="changeAvatar()">
+            <ion-icon name="camera-outline"></ion-icon>
+          </div>
+        </div>
+        <h2>{{profile.first_name}} {{profile.last_name}}</h2>
+        <p>{{profile.email}}</p>
+        <p class="phone">{{profile.phone}}</p>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-container">
+      <div class="stat-item" (click)="goToOrders()">
+        <ion-icon name="bag-outline"></ion-icon>
+        <div class="stat-info">
+          <h3>{{orderCount}}</h3>
+          <p>Orders</p>
+        </div>
+      </div>
+      <div class="stat-item" (click)="goToWishlist()">
+        <ion-icon name="heart-outline"></ion-icon>
+        <div class="stat-info">
+          <h3>{{wishlistCount}}</h3>
+          <p>Wishlist</p>
+        </div>
+      </div>
+      <div class="stat-item" (click)="goToAddresses()">
+        <ion-icon name="location-outline"></ion-icon>
+        <div class="stat-info">
+          <h3>{{addressCount}}</h3>
+          <p>Addresses</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Menu Items -->
+    <div class="menu-container">
+      <div class="menu-item" (click)="goToOrders()">
+        <ion-icon name="bag-handle-outline" slot="start"></ion-icon>
+        <ion-label>My Orders</ion-label>
+        <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
+      </div>
+
+      <div class="menu-item" (click)="goToAddresses()">
+        <ion-icon name="location-outline" slot="start"></ion-icon>
+        <ion-label>Addresses</ion-label>
+        <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
+      </div>
+
+      <div class="menu-item" (click)="goToWishlist()">
+        <ion-icon name="heart-outline" slot="start"></ion-icon>
+        <ion-label>Wishlist</ion-label>
+        <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
+      </div>
+
+      <div class="menu-item" (click)="goToPaymentMethods()">
+        <ion-icon name="card-outline" slot="start"></ion-icon>
+        <ion-label>Payment Methods</ion-label>
+        <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
+      </div>
+
+      <div class="menu-item" (click)="goToNotifications()">
+        <ion-icon name="notifications-outline" slot="start"></ion-icon>
+        <ion-label>Notifications</ion-label>
+        <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
+      </div>
+
+      <div class="menu-item" (click)="goToHelp()">
+        <ion-icon name="help-circle-outline" slot="start"></ion-icon>
+        <ion-label>Help & Support</ion-label>
+        <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
+      </div>
+
+      <div class="menu-item" (click)="goToAbout()">
+        <ion-icon name="information-circle-outline" slot="start"></ion-icon>
+        <ion-label>About</ion-label>
+        <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
+      </div>
+
+      <div class="menu-item logout-item" (click)="logout()">
+        <ion-icon name="log-out-outline" slot="start" color="danger"></ion-icon>
+        <ion-label color="danger">Logout</ion-label>
+      </div>
+    </div>
+  </div>
+</ion-content>

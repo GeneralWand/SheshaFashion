@@ -1,0 +1,570 @@
+<ion-header>
+  <ion-toolbar color="dark">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Vendor Dashboard</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="logout()">
+        <ion-icon name="log-out-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-container">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Loading...</p>
+  </div>
+
+  <!-- Vendor Registration Form (Not a vendor yet) -->
+  <div *ngIf="!isLoading && !vendor" class="registration-container">
+    <div class="registration-card">
+      <ion-icon name="storefront-outline" class="icon-large"></ion-icon>
+      <h2>Become a Vendor</h2>
+      <p>Sell your fashion products to thousands of customers</p>
+      <ion-button expand="block" color="danger" (click)="registerAsVendor()">
+        Apply Now
+      </ion-button>
+    </div>
+  </div>
+
+  <!-- Pending Approval -->
+  <div *ngIf="!isLoading && vendor && !isApproved" class="pending-container">
+    <div class="pending-card">
+      <ion-icon name="time-outline" class="icon-large"></ion-icon>
+      <h2>Application Pending</h2>
+      <p>Your vendor application is under review. We'll notify you once approved.</p>
+      <ion-text color="medium">
+        <p class="small">Store Name: {{vendor.store_name}}</p>
+        <p class="small">Business Email: {{vendor.business_email}}</p>
+      </ion-text>
+    </div>
+  </div>
+
+  <!-- Vendor Dashboard (Approved) -->
+  <div *ngIf="!isLoading && vendor && isApproved" class="dashboard-container">
+    
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <ion-icon name="cube-outline"></ion-icon>
+        <div class="stat-info">
+          <h3>{{stats.totalProducts}}</h3>
+          <p>Products</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <ion-icon name="cart-outline"></ion-icon>
+        <div class="stat-info">
+          <h3>{{stats.totalOrders}}</h3>
+          <p>Orders</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <ion-icon name="cash-outline"></ion-icon>
+        <div class="stat-info">
+          <h3>R{{stats.totalRevenue | number:'1.2-2'}}</h3>
+          <p>Revenue</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <ion-icon name="star-outline"></ion-icon>
+        <div class="stat-info">
+          <h3>{{ (stats.averageRating || 0) | number:'1.1-1' }}</h3>
+          <p>Rating</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs Navigation -->
+    <div class="tabs-nav">
+      <button 
+        [class.active]="activeTab === 'dashboard'" 
+        (click)="selectDashboardTab()">
+        <ion-icon name="grid-outline"></ion-icon>
+        <span>Dashboard</span>
+      </button>
+      <button 
+        [class.active]="activeTab === 'store'" 
+        (click)="activeTab = 'store'">
+        <ion-icon name="storefront-outline"></ion-icon>
+        <span>Store</span>
+      </button>
+      <button 
+        [class.active]="activeTab === 'products'" 
+        (click)="activeTab = 'products'">
+        <ion-icon name="cube-outline"></ion-icon>
+        <span>Products</span>
+      </button>
+      <button 
+        [class.active]="activeTab === 'orders'" 
+        (click)="selectOrdersTab()">
+        <ion-icon name="cart-outline"></ion-icon>
+        <span>Orders</span>
+      </button>
+    </div>
+
+    <!-- Dashboard Tab -->
+    <div *ngIf="activeTab === 'dashboard'" class="tab-content">
+      <div class="recent-orders">
+        <h3>Recent Orders</h3>
+        <div class="orders-list">
+          <div *ngFor="let order of orders.slice(0,5)" class="order-item">
+            <div class="order-info">
+              <p class="order-id">Order #{{order.order_id}}</p>
+              <p class="order-date">{{order.created_date | date:'medium'}}</p>
+              <p class="order-total">R{{order.total | number:'1.2-2'}}</p>
+            </div>
+            <div class="order-status" [class]="order.status">
+              {{order.status}}
+            </div>
+          </div>
+          <div *ngIf="orders.length === 0" class="empty-state-small">
+            <p>No orders yet</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Store Settings Tab -->
+    <div *ngIf="activeTab === 'store'" class="tab-content">
+      <!-- No stores yet -->
+      <div *ngIf="vendorStores.length === 0" class="store-empty-card">
+        <ion-icon name="storefront-outline" class="icon-large"></ion-icon>
+        <h3>No store yet</h3>
+        <p>Create a store to show on the marketplace, then add products and images.</p>
+        <ion-button expand="block" color="danger" (click)="createStoreFromApplication()">
+          <ion-icon name="add-outline" slot="start"></ion-icon>
+          Create store from my application
+        </ion-button>
+        <ion-button expand="block" fill="outline" (click)="promptAddNewStore()">
+          <ion-icon name="create-outline" slot="start"></ion-icon>
+          New store (custom name and details)
+        </ion-button>
+      </div>
+
+      <div *ngIf="vendorStores.length > 0" class="store-form">
+        <h3>Store Information</h3>
+
+        <ion-list lines="full" class="store-picker-list">
+          <ion-item>
+            <ion-label position="stacked">Store you are editing</ion-label>
+            <ion-select
+              interface="popover"
+              [value]="store.store_id"
+              (ionChange)="onVendorStoreChange($event)"
+              placeholder="Select store">
+              <ion-select-option *ngFor="let s of vendorStores" [value]="s.store_id">{{ s.name }}</ion-select-option>
+            </ion-select>
+          </ion-item>
+        </ion-list>
+
+        <ion-button expand="block" fill="outline" class="add-store-btn" (click)="promptAddNewStore()">
+          <ion-icon name="add-outline" slot="start"></ion-icon>
+          Add new store
+        </ion-button>
+        
+        <!-- Logo & cover: data URLs in DB (same pattern as product images) -->
+        <ion-list lines="full" class="store-media-list">
+          <ion-item lines="none" class="store-image-item">
+            <ion-label position="stacked">Store logo</ion-label>
+            <div class="store-media-block">
+              <div class="store-thumb logo" *ngIf="store.logo_url">
+                <img [src]="store.logo_url" alt="Store logo" />
+              </div>
+              <div class="store-thumb logo empty" *ngIf="!store.logo_url">
+                <ion-icon name="image-outline"></ion-icon>
+              </div>
+              <input
+                type="file"
+                #logoInput
+                accept="image/*"
+                style="display: none"
+                (change)="onLogoSelected($event)" />
+              <ion-button expand="block" fill="outline" (click)="logoInput.click()" [disabled]="uploadingImage">
+                <ion-spinner *ngIf="uploadingImage" name="crescent" slot="start"></ion-spinner>
+                <ion-icon *ngIf="!uploadingImage" name="cloud-upload-outline" slot="start"></ion-icon>
+                {{ store.logo_url ? 'Change logo' : 'Select logo' }}
+              </ion-button>
+              <ion-text *ngIf="store.logo_url" color="success" class="img-saved-hint">Image will show on your store page</ion-text>
+            </div>
+          </ion-item>
+
+          <ion-item lines="none" class="store-image-item">
+            <ion-label position="stacked">Cover image</ion-label>
+            <div class="store-media-block">
+              <div class="store-thumb cover" *ngIf="store.cover_image_url">
+                <img [src]="store.cover_image_url" alt="Store cover" />
+              </div>
+              <div class="store-thumb cover empty" *ngIf="!store.cover_image_url">
+                <ion-icon name="images-outline"></ion-icon>
+              </div>
+              <input
+                type="file"
+                #coverInput
+                accept="image/*"
+                style="display: none"
+                (change)="onCoverSelected($event)" />
+              <ion-button expand="block" fill="outline" (click)="coverInput.click()" [disabled]="uploadingImage">
+                <ion-spinner *ngIf="uploadingImage" name="crescent" slot="start"></ion-spinner>
+                <ion-icon *ngIf="!uploadingImage" name="cloud-upload-outline" slot="start"></ion-icon>
+                {{ store.cover_image_url ? 'Change cover' : 'Select cover image' }}
+              </ion-button>
+              <ion-text *ngIf="store.cover_image_url" color="success" class="img-saved-hint">Image will show on your store page</ion-text>
+            </div>
+          </ion-item>
+        </ion-list>
+
+        <!-- Store Details Form -->
+        <ion-list>
+          <ion-item>
+            <ion-label position="floating">Store Name</ion-label>
+            <ion-input [(ngModel)]="store.name"></ion-input>
+          </ion-item>
+          
+          <ion-item>
+            <ion-label position="floating">Description</ion-label>
+            <ion-textarea [(ngModel)]="store.description" rows="3"></ion-textarea>
+          </ion-item>
+          
+          <ion-item>
+            <ion-label position="floating">Phone</ion-label>
+            <ion-input [(ngModel)]="store.phone"></ion-input>
+          </ion-item>
+          
+          <ion-item>
+            <ion-label position="floating">Email</ion-label>
+            <ion-input [(ngModel)]="store.email" type="email"></ion-input>
+          </ion-item>
+          
+          <ion-item>
+            <ion-label position="floating">Delivery Fee (R)</ion-label>
+            <ion-input [(ngModel)]="store.delivery_fee" type="number"></ion-input>
+          </ion-item>
+          
+          <ion-item>
+            <ion-label position="floating">Minimum Order (R)</ion-label>
+            <ion-input [(ngModel)]="store.min_order" type="number"></ion-input>
+          </ion-item>
+          
+          <ion-item>
+            <ion-label position="floating">Estimated Delivery Time</ion-label>
+            <ion-input [(ngModel)]="store.estimated_delivery_time"></ion-input>
+          </ion-item>
+        </ion-list>
+        
+        <ion-button 
+          expand="block" 
+          color="danger" 
+          (click)="saveStoreDetails()" 
+          [disabled]="uploadingImage">
+          <ion-icon name="save-outline" slot="start"></ion-icon>
+          Save Changes
+        </ion-button>
+      </div>
+    </div>
+
+    <!-- Products Tab -->
+    <div *ngIf="activeTab === 'products'" class="tab-content">
+      <ion-text *ngIf="!store.store_id" color="warning" class="products-store-hint">
+        <p>Create a store on the <strong>Store</strong> tab before adding products.</p>
+      </ion-text>
+      <div class="products-header">
+        <h3>My Products</h3>
+        <ion-button color="danger" (click)="openAddProductModal()" [disabled]="!store.store_id">
+          <ion-icon name="add-outline" slot="start"></ion-icon>
+          Add Product
+        </ion-button>
+      </div>
+      
+      <div class="products-grid">
+        <div *ngFor="let product of products" class="product-card">
+          <div class="product-image">
+            <img [src]="product.images && product.images[0] ? product.images[0] : 'assets/img/placeholder-product.svg'" [alt]="product.name">
+            <div class="product-status" [class]="product.status">
+              {{product.status}}
+            </div>
+          </div>
+          <div class="product-info">
+            <h4>{{product.name}}</h4>
+            <p class="price">R{{product.price | number:'1.2-2'}}</p>
+            <p class="discount" *ngIf="product.discount_price">R{{product.discount_price | number:'1.2-2'}}</p>
+            <div class="product-actions">
+              <input
+                type="file"
+                #productImageInput
+                accept="image/*"
+                (change)="onProductImageSelected($event, product)"
+                hidden
+              >
+              <ion-button size="small" fill="clear" (click)="productImageInput.click()">
+                <ion-icon name="image-outline"></ion-icon>
+              </ion-button>
+              <ion-button size="small" fill="clear" (click)="openEditProductModal(product)">
+                <ion-icon name="create-outline"></ion-icon>
+              </ion-button>
+              <ion-button size="small" fill="clear" color="danger" (click)="deleteProduct(product)">
+                <ion-icon name="trash-outline"></ion-icon>
+              </ion-button>
+            </div>
+          </div>
+        </div>
+        
+        <div *ngIf="products.length === 0" class="empty-state">
+          <ion-icon name="cube-outline"></ion-icon>
+          <p>No products yet. Click "Add Product" to get started.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Orders Tab -->
+    <div *ngIf="activeTab === 'orders'" class="tab-content">
+      <h3>Orders &amp; history</h3>
+      <p class="orders-flow-hint"> <strong></strong>  <strong></strong>.</p>
+
+      <ion-segment [(ngModel)]="ordersHistoryFilter" class="orders-filter-segment">
+        <ion-segment-button value="all">All ({{ orders.length }})</ion-segment-button>
+        <ion-segment-button value="active">Active</ion-segment-button>
+        <ion-segment-button value="completed">Completed</ion-segment-button>
+      </ion-segment>
+
+      <div class="orders-list-full">
+        <div *ngFor="let order of filteredOrderHistory" class="order-card">
+          <div class="order-header">
+            <div class="order-id-date">
+              <strong>Order #{{order.order_id}}</strong>
+              <span>{{order.created_date | date:'medium'}}</span>
+              <span class="order-status-text">{{ orderStatusLabel(order) }}</span>
+            </div>
+            <div *ngIf="isOrderAwaitingDriver(order)" class="order-status-badge awaiting-driver">
+              Awaiting driver
+            </div>
+            <div *ngIf="!isOrderAwaitingDriver(order)" class="order-status-dropdown">
+              <ion-select 
+                [value]="order.status" 
+                (ionChange)="updateOrderStatus(order, $event.detail.value)"
+                interface="popover">
+                <ion-select-option value="confirmed">Confirmed</ion-select-option>
+                <ion-select-option value="preparing">Preparing</ion-select-option>
+                <ion-select-option value="ready">Ready for Pickup</ion-select-option>
+                <ion-select-option value="out_for_delivery">Out for Delivery</ion-select-option>
+                <ion-select-option value="delivered">Delivered</ion-select-option>
+                <ion-select-option value="cancelled">Cancelled</ion-select-option>
+              </ion-select>
+            </div>
+          </div>
+          
+          <div class="order-body">
+            <p><strong>Customer:</strong> {{order.user?.full_name}}</p>
+            <p><strong>Phone:</strong> {{order.user?.phone}}</p>
+            <p><strong>Items:</strong> {{order.items?.length || 0}} items</p>
+            <p><strong>Total:</strong> R{{order.total | number:'1.2-2'}}</p>
+            <p *ngIf="order.delivery_notes"><strong>Notes:</strong> {{order.delivery_notes}}</p>
+          </div>
+          
+          <div class="order-footer">
+            <ion-button size="small" fill="clear" (click)="viewOrderDetails(order)">
+              View Details
+            </ion-button>
+          </div>
+        </div>
+        
+        <div *ngIf="filteredOrderHistory.length === 0" class="empty-state">
+          <ion-icon name="cart-outline"></ion-icon>
+          <p>{{ orders.length === 0 ? 'No orders yet' : 'No orders in this filter' }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Product -->
+  <ion-modal [isOpen]="isAddProductModalOpen" (didDismiss)="onAddProductModalDismiss()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar color="dark">
+          <ion-title>Add Product</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="closeAddProductModal()">Close</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding vendor-product-modal">
+        <ion-list lines="full">
+          <ion-item *ngIf="categoryParents.length === 0" lines="none">
+            <ion-note color="warning">
+              No categories found. Add top-level categories (parent_id empty), then subcategories with parent_id pointing to the parent row.
+            </ion-note>
+          </ion-item>
+          <ion-item>
+            <ion-label position="stacked">Category</ion-label>
+            <ion-select
+              [(ngModel)]="addProductForm.parent_category_id"
+              (ionChange)="onAddParentCategoryChange()"
+              interface="popover"
+              placeholder="e.g. Men"
+              [disabled]="categoryParents.length === 0">
+              <ion-select-option *ngFor="let cat of categoryParents" [value]="cat.id">{{ cat.name }}</ion-select-option>
+            </ion-select>
+          </ion-item>
+          <ion-item *ngIf="addFormSubcategories.length > 0">
+            <ion-label position="stacked">Subcategory</ion-label>
+            <ion-select [(ngModel)]="addProductForm.subcategory_id" interface="popover" placeholder="e.g. T-Shirts">
+              <ion-select-option *ngFor="let sub of addFormSubcategories" [value]="sub.id">{{ sub.name }}</ion-select-option>
+            </ion-select>
+          </ion-item>
+          <ion-item lines="none" *ngIf="addProductForm.parent_category_id && addFormSubcategories.length === 0">
+            <ion-note color="medium">No subcategories — product is filed under the selected category.</ion-note>
+          </ion-item>
+          <ion-item>
+            <ion-label position="floating">Product Name</ion-label>
+            <ion-input [(ngModel)]="addProductForm.name"></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label position="floating">Description</ion-label>
+            <ion-textarea [(ngModel)]="addProductForm.description" rows="3"></ion-textarea>
+          </ion-item>
+          <ion-item>
+            <ion-label position="stacked">Size</ion-label>
+            <ion-select [(ngModel)]="addProductForm.size" interface="popover" placeholder="Optional">
+              <ion-select-option value="">Not set</ion-select-option>
+              <ion-select-option *ngFor="let opt of productSizeOptions" [value]="opt.value">{{ opt.label }}</ion-select-option>
+            </ion-select>
+          </ion-item>
+          <ion-item>
+            <ion-label position="floating">Color</ion-label>
+            <ion-input [(ngModel)]="addProductForm.color" placeholder="e.g. Navy, Black"></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label position="floating">Price (R)</ion-label>
+            <ion-input [(ngModel)]="addProductForm.price" type="number"></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label position="floating">Discount Price (Optional)</ion-label>
+            <ion-input [(ngModel)]="addProductForm.discount_price" type="number"></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label position="floating">Stock Quantity</ion-label>
+            <ion-input [(ngModel)]="addProductForm.stock" type="number"></ion-input>
+          </ion-item>
+          <ion-item lines="none" class="product-image-item">
+            <ion-label position="stacked">Product Image (Optional)</ion-label>
+            <input
+              type="file"
+              (change)="onAddProductImageSelected($event)"
+              accept="image/*"
+              style="display: none"
+              #addProductImageInput>
+            <ion-button expand="block" fill="outline" (click)="addProductImageInput.click()">
+              <ion-icon name="image-outline" slot="start"></ion-icon>
+              {{ addProductImagePreview ? 'Change Image' : 'Select Image' }}
+            </ion-button>
+            <ion-text *ngIf="addProductImagePreview" color="success" class="image-selected-hint">
+              Image selected
+            </ion-text>
+          </ion-item>
+        </ion-list>
+        <ion-button expand="block" color="danger" (click)="submitAddProduct()">
+          <ion-icon name="checkmark-outline" slot="start"></ion-icon>
+          Add Product
+        </ion-button>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+  <!-- Edit Product -->
+  <ion-modal [isOpen]="isEditProductModalOpen" (didDismiss)="onEditProductModalDismiss()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar color="dark">
+          <ion-title>Edit Product</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="closeEditProductModal()">Close</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding vendor-product-modal">
+        <ion-list lines="full">
+          <ion-item>
+            <ion-label position="stacked">Category</ion-label>
+            <ion-select
+              [(ngModel)]="editProductForm.parent_category_id"
+              (ionChange)="onEditParentCategoryChange()"
+              interface="popover">
+              <ion-select-option *ngFor="let cat of categoryParents" [value]="cat.id">{{ cat.name }}</ion-select-option>
+            </ion-select>
+          </ion-item>
+          <ion-item *ngIf="editFormSubcategories.length > 0">
+            <ion-label position="stacked">Subcategory</ion-label>
+            <ion-select [(ngModel)]="editProductForm.subcategory_id" interface="popover">
+              <ion-select-option *ngFor="let sub of editFormSubcategories" [value]="sub.id">{{ sub.name }}</ion-select-option>
+            </ion-select>
+          </ion-item>
+          <ion-item lines="none" *ngIf="editProductForm.parent_category_id && editFormSubcategories.length === 0">
+            <ion-note color="medium">No subcategories — product stays under the selected category.</ion-note>
+          </ion-item>
+          <ion-item>
+            <ion-label position="floating">Product Name</ion-label>
+            <ion-input [(ngModel)]="editProductForm.name"></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label position="floating">Description</ion-label>
+            <ion-textarea [(ngModel)]="editProductForm.description" rows="3"></ion-textarea>
+          </ion-item>
+          <ion-item>
+            <ion-label position="stacked">Size</ion-label>
+            <ion-select [(ngModel)]="editProductForm.size" interface="popover" placeholder="Optional">
+              <ion-select-option value="">Not set</ion-select-option>
+              <ion-select-option *ngFor="let opt of productSizeOptions" [value]="opt.value">{{ opt.label }}</ion-select-option>
+            </ion-select>
+          </ion-item>
+          <ion-item>
+            <ion-label position="floating">Color</ion-label>
+            <ion-input [(ngModel)]="editProductForm.color" placeholder="e.g. Navy"></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label position="floating">Price (R)</ion-label>
+            <ion-input [(ngModel)]="editProductForm.price" type="number"></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label position="floating">Discount Price</ion-label>
+            <ion-input [(ngModel)]="editProductForm.discount_price" type="number"></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label position="floating">Stock Quantity</ion-label>
+            <ion-input [(ngModel)]="editProductForm.stock" type="number"></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label position="stacked">Status</ion-label>
+            <ion-select [(ngModel)]="editProductForm.status" interface="popover">
+              <ion-select-option value="available">Available</ion-select-option>
+              <ion-select-option value="unavailable">Unavailable</ion-select-option>
+            </ion-select>
+          </ion-item>
+          <ion-item lines="none" class="product-image-item">
+            <ion-label position="stacked">Product Image (Optional)</ion-label>
+            <input
+              type="file"
+              (change)="onEditProductImageSelected($event)"
+              accept="image/*"
+              style="display: none"
+              #editProductImageInput>
+            <ion-button expand="block" fill="outline" (click)="editProductImageInput.click()">
+              <ion-icon name="image-outline" slot="start"></ion-icon>
+              {{ editProductImagePreview ? 'Change Image' : 'Select Image' }}
+            </ion-button>
+            <ion-text *ngIf="editProductImagePreview" color="success" class="image-selected-hint">
+              Image selected
+            </ion-text>
+          </ion-item>
+        </ion-list>
+        <ion-button expand="block" color="danger" (click)="submitEditProduct()">
+          <ion-icon name="save-outline" slot="start"></ion-icon>
+          Save Changes
+        </ion-button>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+</ion-content>

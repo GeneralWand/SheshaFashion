@@ -35,3 +35,64 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import "@ionic/angular/css/palettes/dark.system.css";
+
+
+// Global color scheme
+:root {
+    --ion-color-primary: #dc2626;
+    --ion-color-primary-rgb: 220, 38, 38;
+    --ion-color-primary-contrast: #ffffff;
+    --ion-color-primary-contrast-rgb: 255, 255, 255;
+    --ion-color-primary-shade: #c22121;
+    --ion-color-primary-tint: #e03c3c;
+  
+    --ion-color-secondary: #000000;
+    --ion-color-secondary-rgb: 0, 0, 0;
+    --ion-color-secondary-contrast: #ffffff;
+    --ion-color-secondary-contrast-rgb: 255, 255, 255;
+    --ion-color-secondary-shade: #000000;
+    --ion-color-secondary-tint: #1a1a1a;
+  }
+  
+  // Global button styles
+  ion-button {
+    --border-radius: 8px;
+    font-weight: 600;
+    text-transform: none;
+  }
+  
+  // Global card styles
+  ion-card {
+    margin: 12px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  // Global input styles
+  ion-input, ion-textarea, ion-select {
+    --padding-start: 12px;
+    --padding-end: 12px;
+    --padding-top: 12px;
+    --padding-bottom: 12px;
+    --border-radius: 8px;
+  }
+  
+  // Toast customization
+  ion-toast {
+    --border-radius: 8px;
+    --button-color: #dc2626;
+  }
+  
+  // Alert customization
+  ion-alert {
+    --border-radius: 12px;
+    
+    .alert-button {
+      color: #dc2626;
+    }
+  }
+  
+  // Loading customization
+  ion-loading {
+    --spinner-color: #dc2626;
+  }

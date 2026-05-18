@@ -1,0 +1,79 @@
+<ion-header>
+  <ion-toolbar color="dark">
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title>My Orders</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <!-- Tabs -->
+  <ion-segment [(ngModel)]="selectedStatus" (ionChange)="filterOrders()">
+    <ion-segment-button value="all">
+      <ion-label>All</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="pending">
+      <ion-label>Pending</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="processing">
+      <ion-label>Processing</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="shipped">
+      <ion-label>Shipped</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="delivered">
+      <ion-label>Delivered</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-spinner">
+    <ion-spinner name="crescent"></ion-spinner>
+  </div>
+
+  <!-- Orders List -->
+  <div *ngIf="!loading && filteredOrders.length === 0" class="empty-state">
+    <ion-icon name="bag-outline"></ion-icon>
+    <h3>No Orders Found</h3>
+    <p>You haven't placed any orders yet</p>
+    <ion-button color="danger" (click)="goToHome()">Start Shopping</ion-button>
+  </div>
+
+  <div *ngIf="!loading && filteredOrders.length > 0" class="orders-list">
+    <div *ngFor="let order of filteredOrders" class="order-card" (click)="goToOrderDetail(order.id)">
+      <div class="order-header">
+        <div>
+          <p class="order-id">Order #{{order.id.slice(-8)}}</p>
+          <p class="order-date">{{order.createdAt | date:'medium'}}</p>
+        </div>
+        <div class="order-status" [class]="order.status">
+          {{order.status | uppercase}}
+        </div>
+      </div>
+
+      <div class="order-items">
+        <div *ngFor="let item of order.items.slice(0, 2)" class="order-item-preview">
+          <img [src]="item.product?.images?.length ? item.product.images[0] : placeholderProduct" [alt]="item.product?.name || 'Product'">
+          <div class="item-info">
+            <p class="item-name">{{item.product?.name || 'Product'}}</p>
+            <p class="item-quantity">Qty: {{item.quantity}}</p>
+          </div>
+        </div>
+        <div *ngIf="order.items.length > 2" class="more-items">
+          +{{order.items.length - 2}} more items
+        </div>
+      </div>
+
+      <div class="order-footer">
+        <div class="order-total">
+          <span>Total:</span>
+          <strong>{{order.total | currency}}</strong>
+        </div>
+        <ion-button fill="clear" color="danger" size="small" (click)="trackOrder($event, order.id)">
+          Track Order
+        </ion-button>
+      </div>
+    </div>
+  </div>
+</ion-content>

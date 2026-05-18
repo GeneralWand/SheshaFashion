@@ -1,0 +1,207 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title>Register as Vendor</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <form [formGroup]="vendorRegForm" (ngSubmit)="registerVendor()">
+    <!-- Tabs -->
+    <ion-segment [(ngModel)]="activeSegment" [ngModelOptions]="{standalone: true}">
+      <ion-segment-button value="account">
+        <ion-label>Account</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="business">
+        <ion-label>Business</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="stores">
+        <ion-label>Stores</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+
+    <!-- Account Information -->
+    <div *ngIf="activeSegment === 'account'">
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>Account Information</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-item>
+            <ion-label position="floating">Full Name *</ion-label>
+            <ion-input formControlName="fullName" type="text"></ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="floating">Email Address *</ion-label>
+            <ion-input formControlName="email" type="email"></ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="floating">Phone Number *</ion-label>
+            <ion-input formControlName="phone" type="tel"></ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="floating">Password *</ion-label>
+            <ion-input formControlName="password" type="password"></ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="floating">Confirm Password *</ion-label>
+            <ion-input formControlName="confirmPassword" type="password"></ion-input>
+          </ion-item>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+    <!-- Business Information -->
+    <div *ngIf="activeSegment === 'business'">
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>Business Information</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-item>
+            <ion-label position="floating">Store/Business Name *</ion-label>
+            <ion-input formControlName="storeName" type="text"></ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="floating">Business Email *</ion-label>
+            <ion-input formControlName="businessEmail" type="email"></ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="floating">Business Phone *</ion-label>
+            <ion-input formControlName="businessPhone" type="tel"></ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="floating">Business Address *</ion-label>
+            <ion-textarea formControlName="businessAddress" rows="3"></ion-textarea>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="floating">Tax ID (Optional)</ion-label>
+            <ion-input formControlName="taxId" type="text"></ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label>Business Registration Document</ion-label>
+            <ion-button (click)="uploadBusinessDoc()" expand="block" fill="outline">
+              <ion-icon name="document" slot="start"></ion-icon>
+              Upload Document
+            </ion-button>
+          </ion-item>
+          <div *ngIf="businessDocUrl" class="document-preview">
+            <img *ngIf="businessDocUrl.startsWith('data:image')" [src]="businessDocUrl" alt="Business document">
+            <ion-note *ngIf="businessDocUrl.startsWith('data:application/pdf')" color="medium">PDF document attached.</ion-note>
+            <div *ngIf="!businessDocUrl.startsWith('data:image') && !businessDocUrl.startsWith('data:application/pdf')" class="doc-fallback">
+              <ion-icon name="document-text"></ion-icon>
+              <span>Document attached</span>
+            </div>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+    <!-- Store Management -->
+    <div *ngIf="activeSegment === 'stores'">
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>Your Stores</ion-card-title>
+          <ion-card-subtitle>Add at least one store to get started</ion-card-subtitle>
+        </ion-card-header>
+        <ion-card-content>
+          <div *ngFor="let store of stores; let i = index" class="store-item">
+            <ion-card class="store-card">
+              <ion-card-header>
+                <ion-card-title>Store {{ i + 1 }}</ion-card-title>
+                <ion-buttons slot="end">
+                  <ion-button color="danger" (click)="removeStore(i)">
+                    <ion-icon name="trash"></ion-icon>
+                  </ion-button>
+                </ion-buttons>
+              </ion-card-header>
+              <ion-card-content>
+                <ion-item>
+                  <ion-label position="floating">Store Name *</ion-label>
+                  <ion-input [(ngModel)]="store.name" [ngModelOptions]="{standalone: true}" type="text"></ion-input>
+                </ion-item>
+
+                <ion-item>
+                  <ion-label position="floating">Store Description</ion-label>
+                  <ion-textarea [(ngModel)]="store.description" [ngModelOptions]="{standalone: true}" rows="2"></ion-textarea>
+                </ion-item>
+
+                <ion-item>
+                  <ion-label position="floating">Street Address *</ion-label>
+                  <ion-input [(ngModel)]="store.address" [ngModelOptions]="{standalone: true}" type="text"></ion-input>
+                </ion-item>
+
+                <div class="location-picker">
+                  <ion-button expand="block" fill="outline" (click)="pickStoreLocation(i)">
+                    <ion-icon name="location" slot="start"></ion-icon>
+                    Pick Location on Map
+                  </ion-button>
+                  <div *ngIf="store.location" class="location-info">
+                    <ion-icon name="checkmark-circle"></ion-icon>
+                    Location selected
+                  </div>
+                </div>
+
+                <ion-item>
+                  <ion-label position="floating">Delivery Fee (R)</ion-label>
+                  <ion-input [(ngModel)]="store.deliveryFee" [ngModelOptions]="{standalone: true}" type="number"></ion-input>
+                </ion-item>
+
+                <ion-item>
+                  <ion-label position="floating">Minimum Order (R)</ion-label>
+                  <ion-input [(ngModel)]="store.minOrder" [ngModelOptions]="{standalone: true}" type="number"></ion-input>
+                </ion-item>
+
+                <ion-item>
+                  <ion-label>Store Logo</ion-label>
+                  <ion-button (click)="uploadStoreLogo(i)" expand="block" fill="outline">
+                    <ion-icon name="image" slot="start"></ion-icon>
+                    Upload Logo
+                  </ion-button>
+                </ion-item>
+                <div *ngIf="store.logoUrl" class="logo-preview ion-padding-start ion-padding-end ion-padding-bottom">
+                  <img *ngIf="store.logoUrl.startsWith('data:image')" [src]="store.logoUrl" alt="Store logo preview">
+                </div>
+              </ion-card-content>
+            </ion-card>
+          </div>
+
+          <ion-button expand="block" fill="clear" (click)="addStore()">
+            <ion-icon name="add-circle" slot="start"></ion-icon>
+            Add Another Store
+          </ion-button>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>Terms & Conditions</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-item>
+            <ion-label class="ion-text-wrap">I agree to the vendor terms and conditions, including the commission rate of 10% on all sales</ion-label>
+            <ion-checkbox formControlName="termsAccepted" slot="start"></ion-checkbox>
+          </ion-item>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+    <div class="submit-button">
+      <ion-button type="submit" expand="block" [disabled]="!vendorRegForm.valid || stores.length === 0">
+        Submit Vendor Application
+        <ion-icon name="send" slot="end"></ion-icon>
+      </ion-button>
+    </div>
+  </form>
+</ion-content>

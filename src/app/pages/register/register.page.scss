@@ -1,0 +1,129 @@
+.register-content {
+    --background: linear-gradient(135deg, #ffffff 0%, #f8f8f8 100%);
+  }
+  
+  .header {
+    padding: 16px;
+    
+    ion-button {
+      --color: #000;
+      --padding-start: 0;
+      margin: 0;
+    }
+  }
+  
+  .form-container {
+    background: white;
+    border-radius: 30px 30px 0 0;
+    padding: 30px 20px;
+    min-height: 90vh;
+    
+    h2 {
+      font-size: 28px;
+      font-weight: bold;
+      margin: 0 0 8px;
+      color: #000;
+    }
+    
+    .subtitle {
+      color: #666;
+      margin: 0 0 30px;
+      font-size: 14px;
+    }
+    
+    .form-item {
+      margin-bottom: 20px;
+      --border-radius: 12px;
+      --background: #f5f5f5;
+      --padding-start: 16px;
+      --padding-end: 16px;
+      --inner-padding-end: 0;
+      
+      ion-label {
+        font-weight: 500;
+        color: #666;
+      }
+    }
+    
+    .terms {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 20px 0;
+      
+      ion-checkbox {
+        --border-radius: 4px;
+        --size: 20px;
+      }
+      
+      ion-label {
+        font-size: 14px;
+        color: #666;
+        
+        strong {
+          color: #ff0000;
+        }
+      }
+    }
+    
+    .register-btn {
+      --border-radius: 30px;
+      height: 48px;
+      margin-bottom: 20px;
+      font-weight: bold;
+      text-transform: none;
+      font-size: 16px;
+    }
+    
+    .divider {
+      text-align: center;
+      margin: 20px 0;
+      position: relative;
+      
+      span {
+        background: white;
+        padding: 0 15px;
+        color: #999;
+        font-size: 14px;
+        position: relative;
+        z-index: 1;
+      }
+      
+      &::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: #e0e0e0;
+        transform: translateY(-50%);
+      }
+    }
+    
+    .social-btn {
+      --border-radius: 30px;
+      height: 48px;
+      --border-color: #ddd;
+      margin-bottom: 20px;
+      text-transform: none;
+      font-size: 16px;
+    }
+    
+    .login-link {
+      text-align: center;
+      margin-top: 20px;
+      
+      p {
+        color: #666;
+        font-size: 14px;
+        
+        ion-button {
+          --color: #ff0000;
+          margin: 0;
+          height: auto;
+          font-weight: bold;
+        }
+      }
+    }
+  }

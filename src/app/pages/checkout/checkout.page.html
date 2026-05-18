@@ -1,0 +1,102 @@
+<ion-header>
+  <ion-toolbar color="dark">
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title>Checkout</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="checkout-container" *ngIf="!loading && cart">
+    <section class="card">
+      <h3>Delivery Address</h3>
+
+      <ion-radio-group [(ngModel)]="selectedAddressId" *ngIf="addresses.length > 0">
+        <ion-item *ngFor="let address of addresses" lines="full">
+          <ion-radio [value]="address.id" slot="start"></ion-radio>
+          <ion-label>
+            <h4>{{ address.label || 'Address' }} - {{ address.fullName }}</h4>
+            <p>{{ address.addressLine1 }} {{ address.addressLine2 }}</p>
+            <p>{{ address.city }}, {{ address.state }} {{ address.zipCode }}</p>
+            <p>{{ address.phone }}</p>
+          </ion-label>
+        </ion-item>
+      </ion-radio-group>
+
+      <div class="new-address">
+        <h4>Add New Address</h4>
+        <ion-item>
+          <ion-input [(ngModel)]="newAddress.label" placeholder="Label (Home, Work)"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-input [(ngModel)]="newAddress.fullName" placeholder="Full name"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-input [(ngModel)]="newAddress.phone" placeholder="Phone"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-input [(ngModel)]="newAddress.addressLine1" placeholder="Address line 1"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-input [(ngModel)]="newAddress.addressLine2" placeholder="Address line 2 (optional)"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-input [(ngModel)]="newAddress.city" placeholder="City"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-input [(ngModel)]="newAddress.state" placeholder="State / Province"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-input [(ngModel)]="newAddress.zipCode" placeholder="ZIP / Postal code"></ion-input>
+        </ion-item>
+        <ion-button expand="block" fill="outline" (click)="saveNewAddress()">
+          Save Address
+        </ion-button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h3>Payment Method</h3>
+      <ion-segment [(ngModel)]="paymentMethod">
+        <ion-segment-button value="cash">
+          <ion-label>Cash</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="card">
+          <ion-label>Card</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="wallet">
+          <ion-label>Wallet</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+    </section>
+
+    <section class="card">
+      <h3>Order Summary</h3>
+      <div class="summary-row">
+        <span>Items</span>
+        <span>{{ cart.items.length }}</span>
+      </div>
+      <div class="summary-row">
+        <span>Subtotal</span>
+        <span>R{{ cart.subtotal | number:'1.2-2' }}</span>
+      </div>
+      <div class="summary-row">
+        <span>Delivery</span>
+        <span>R{{ cart.delivery_fee | number:'1.2-2' }}</span>
+      </div>
+      <div class="summary-row total">
+        <span>Total</span>
+        <span>R{{ cart.total | number:'1.2-2' }}</span>
+      </div>
+
+      <ion-button
+        expand="block"
+        color="danger"
+        [disabled]="placingOrder || !selectedAddressId"
+        (click)="placeOrder()">
+        Place Order
+      </ion-button>
+    </section>
+  </div>
+</ion-content>
