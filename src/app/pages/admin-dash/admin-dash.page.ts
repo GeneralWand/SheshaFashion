@@ -71,7 +71,7 @@ export interface AdminActivity {
 @Component({
   selector: 'app-admin-dash',
   templateUrl: './admin-dash.page.html',
-  styleUrls: ['./admin-dash.page.scss'],
+  host: { class: 'admin-dash' },
   standalone: false,
 })
 export class AdminDashPage implements OnInit {

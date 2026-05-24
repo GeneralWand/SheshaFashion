@@ -38,7 +38,7 @@ export interface DeliveryHistoryRow {
 @Component({
   selector: 'app-driver-dash',
   templateUrl: './driver-dash.page.html',
-  styleUrls: ['./driver-dash.page.scss'],
+  host: { class: 'driver-dash' },
   standalone: false,
 })
 export class DriverDashPage implements OnInit, OnDestroy, ViewWillEnter {

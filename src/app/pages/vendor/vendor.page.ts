@@ -14,7 +14,7 @@ import { PRODUCT_SIZE_OPTIONS } from '../../constants/product-attributes';
 @Component({
   selector: 'app-vendor',
   templateUrl: './vendor.page.html',
-  styleUrls: ['./vendor.page.scss'],
+  host: { class: 'vendor' },
   standalone: false,
 })
 export class VendorPage implements OnInit, OnDestroy {

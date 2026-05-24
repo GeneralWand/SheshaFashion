@@ -7,7 +7,7 @@ import { Store, ProductVariant } from '../../models/store.model';
 @Component({
   selector: 'app-cart',
   templateUrl: './cart.page.html',
-  styleUrls: ['./cart.page.scss'],
+  host: { class: 'cart' },
   standalone: false,
 })
 export class CartPage implements OnInit {
