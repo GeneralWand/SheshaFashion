@@ -21,6 +21,7 @@ export class VendorPage implements OnInit, OnDestroy {
   activeTab: 'dashboard' | 'store' | 'products' | 'orders' | 'analytics' = 'dashboard';
   ordersHistoryFilter: 'all' | 'active' | 'completed' = 'all';
   
+  today: Date = new Date();
   // Vendor Info
   vendor: any = null;
   isApproved = false;

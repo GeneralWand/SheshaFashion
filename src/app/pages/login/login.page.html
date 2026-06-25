@@ -1,73 +1,218 @@
-<ion-content class="login-content">
-  <div class="logo-container">
-    <div class="logo">
-      <h1>Shesha</h1>
-      <p>Fashion</p>
-    </div>
-  </div>
+<ion-content class="auth-page">
+  <div class="auth-container">
+    <!-- Left Panel - Login -->
+    <div class="auth-panel auth-login">
+      <div class="auth-panel-inner">
+        <div class="auth-brand">
+          <ion-icon name="shirt-outline" class="auth-brand-icon"></ion-icon>
+          <h1 class="auth-brand-name">Shesha</h1>
+          <p class="auth-brand-tagline">Fashion</p>
+        </div>
 
-  <div class="form-container">
-    <h2>Welcome Back</h2>
-    <p class="subtitle">Sign in to continue shopping</p>
+        <div class="auth-form-header">
+          <h2 class="auth-welcome">Welcome Back</h2>
+          <p class="auth-subtitle">Sign in to continue shopping</p>
+        </div>
 
-    <form (ngSubmit)="login()" #loginForm="ngForm">
-      <ion-item lines="none" class="form-item">
-        <ion-label position="floating">Email Address</ion-label>
-        <ion-input 
-          type="email" 
-          [(ngModel)]="credentials.email" 
-          name="email"
-          required
-          email>
-        </ion-input>
-      </ion-item>
+        <form (ngSubmit)="login()" #loginForm="ngForm" class="auth-form">
+          <div class="auth-field-group">
+            <ion-item lines="none" class="auth-field">
+              <ion-label position="floating">Email Address</ion-label>
+              <ion-input 
+                type="email" 
+                [(ngModel)]="loginData.email" 
+                name="loginEmail"
+                required
+                email>
+              </ion-input>
+              <ion-icon name="mail-outline" slot="start" class="auth-field-icon"></ion-icon>
+            </ion-item>
 
-      <ion-item lines="none" class="form-item">
-        <ion-label position="floating">Password</ion-label>
-        <ion-input 
-          type="password" 
-          [(ngModel)]="credentials.password" 
-          name="password"
-          required>
-        </ion-input>
-      </ion-item>
+            <ion-item lines="none" class="auth-field">
+              <ion-label position="floating">Password</ion-label>
+              <ion-input 
+                [type]="showLoginPassword ? 'text' : 'password'" 
+                [(ngModel)]="loginData.password" 
+                name="loginPassword"
+                required>
+              </ion-input>
+              <ion-icon name="lock-closed-outline" slot="start" class="auth-field-icon"></ion-icon>
+              <ion-icon 
+                [name]="showLoginPassword ? 'eye-off-outline' : 'eye-outline'" 
+                slot="end" 
+                class="auth-password-toggle"
+                (click)="showLoginPassword = !showLoginPassword">
+              </ion-icon>
+            </ion-item>
+          </div>
 
-      <div class="forgot-password">
-        <ion-button fill="clear" size="small" (click)="forgotPassword()">
-          Forgot Password?
-        </ion-button>
-      </div>
+          <div class="auth-options">
+            <div class="auth-remember">
+              <ion-checkbox [(ngModel)]="rememberMe" name="rememberMe" class="auth-checkbox"></ion-checkbox>
+              <span class="auth-remember-label">Remember me</span>
+            </div>
+            <ion-button fill="clear" size="small" (click)="forgotPassword()" class="auth-forgot-btn">
+              Forgot Password?
+            </ion-button>
+          </div>
 
-      <ion-button 
-        type="submit" 
-        expand="block" 
-        color="danger" 
-        class="login-btn"
-        [disabled]="loginForm.invalid">
-        Sign In
-      </ion-button>
-
-      <div class="divider">
-        <span>or</span>
-      </div>
-
-      <ion-button 
-        expand="block" 
-        fill="outline" 
-        color="dark" 
-        class="social-btn"
-        (click)="loginWithGoogle()">
-        <ion-icon name="logo-google" slot="start"></ion-icon>
-        Continue with Google
-      </ion-button>
-
-      <div class="register-link">
-        <p>Don't have an account? 
-          <ion-button fill="clear" color="danger" (click)="goToRegister()">
-            Sign Up
+          <ion-button 
+            type="submit" 
+            expand="block" 
+            class="auth-submit-btn"
+            [disabled]="loginForm.invalid">
+            <ion-icon name="log-in-outline" slot="start"></ion-icon>
+            Sign In
           </ion-button>
-        </p>
+
+          <div class="auth-divider">
+            <span>or continue with</span>
+          </div>
+
+          <div class="auth-social">
+            <ion-button 
+              expand="block" 
+              fill="outline" 
+              class="auth-social-btn google"
+              (click)="loginWithGoogle()">
+              <ion-icon name="logo-google" slot="start"></ion-icon>
+              Google
+            </ion-button>
+            <ion-button 
+              expand="block" 
+              fill="outline" 
+              class="auth-social-btn facebook"
+              (click)="loginWithFacebook()">
+              <ion-icon name="logo-facebook" slot="start"></ion-icon>
+              Facebook
+            </ion-button>
+          </div>
+        </form>
       </div>
-    </form>
+    </div>
+
+    <!-- Right Panel - Register -->
+    <div class="auth-panel auth-register">
+      <div class="auth-panel-inner">
+        <div class="auth-form-header">
+          <h2 class="auth-welcome">Create Account</h2>
+          <p class="auth-subtitle">Join Shesha Fashion and start shopping</p>
+        </div>
+
+        <form (ngSubmit)="register()" #registerForm="ngForm" class="auth-form">
+          <div class="auth-field-group">
+            <div class="auth-field-row">
+              <ion-item lines="none" class="auth-field half">
+                <ion-label position="floating">First Name</ion-label>
+                <ion-input 
+                  type="text" 
+                  [(ngModel)]="registerData.firstName" 
+                  name="firstName"
+                  required>
+                </ion-input>
+                <ion-icon name="person-outline" slot="start" class="auth-field-icon"></ion-icon>
+              </ion-item>
+
+              <ion-item lines="none" class="auth-field half">
+                <ion-label position="floating">Last Name</ion-label>
+                <ion-input 
+                  type="text" 
+                  [(ngModel)]="registerData.lastName" 
+                  name="lastName"
+                  required>
+                </ion-input>
+                <ion-icon name="person-outline" slot="start" class="auth-field-icon"></ion-icon>
+              </ion-item>
+            </div>
+
+            <ion-item lines="none" class="auth-field">
+              <ion-label position="floating">Email Address</ion-label>
+              <ion-input 
+                type="email" 
+                [(ngModel)]="registerData.email" 
+                name="registerEmail"
+                required
+                email>
+              </ion-input>
+              <ion-icon name="mail-outline" slot="start" class="auth-field-icon"></ion-icon>
+            </ion-item>
+
+            <ion-item lines="none" class="auth-field">
+              <ion-label position="floating">Phone Number</ion-label>
+              <ion-input 
+                type="tel" 
+                [(ngModel)]="registerData.phone" 
+                name="phone"
+                required>
+              </ion-input>
+              <ion-icon name="call-outline" slot="start" class="auth-field-icon"></ion-icon>
+            </ion-item>
+
+            <ion-item lines="none" class="auth-field">
+              <ion-label position="floating">Password</ion-label>
+              <ion-input 
+                [type]="showRegisterPassword ? 'text' : 'password'" 
+                [(ngModel)]="registerData.password" 
+                name="registerPassword"
+                required
+                minlength="6">
+              </ion-input>
+              <ion-icon name="lock-closed-outline" slot="start" class="auth-field-icon"></ion-icon>
+              <ion-icon 
+                [name]="showRegisterPassword ? 'eye-off-outline' : 'eye-outline'" 
+                slot="end" 
+                class="auth-password-toggle"
+                (click)="showRegisterPassword = !showRegisterPassword">
+              </ion-icon>
+            </ion-item>
+
+            <div class="auth-error" *ngIf="registerForm.controls['registerPassword']?.touched && registerForm.controls['registerPassword']?.errors?.['minlength']">
+              <ion-icon name="alert-circle-outline"></ion-icon>
+              <span>Password must be at least 6 characters</span>
+            </div>
+
+            <ion-item lines="none" class="auth-field">
+              <ion-label position="floating">Confirm Password</ion-label>
+              <ion-input 
+                [type]="showRegisterPassword ? 'text' : 'password'" 
+                [(ngModel)]="confirmPassword" 
+                name="confirmPassword"
+                required>
+              </ion-input>
+              <ion-icon name="lock-open-outline" slot="start" class="auth-field-icon"></ion-icon>
+            </ion-item>
+          </div>
+
+          <div class="auth-terms">
+            <ion-checkbox [(ngModel)]="acceptTerms" name="terms" class="auth-checkbox"></ion-checkbox>
+            <ion-label class="auth-terms-label">
+              I agree to the <strong>Terms of Service</strong> and <strong>Privacy Policy</strong>
+            </ion-label>
+          </div>
+
+          <ion-button 
+            type="submit" 
+            expand="block" 
+            class="auth-submit-btn register-btn"
+            [disabled]="registerForm.invalid || !acceptTerms || registerPasswordsMismatch()">
+            <ion-icon name="person-add-outline" slot="start"></ion-icon>
+            Create Account
+          </ion-button>
+
+          <div class="auth-divider">
+            <span>or sign up with</span>
+          </div>
+
+          <ion-button 
+            expand="block" 
+            fill="outline" 
+            class="auth-social-btn google"
+            (click)="registerWithGoogle()">
+            <ion-icon name="logo-google" slot="start"></ion-icon>
+            Google
+          </ion-button>
+        </form>
+      </div>
+    </div>
   </div>
 </ion-content>

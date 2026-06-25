@@ -20,7 +20,8 @@ import { isUniqueViolation, isUsersEmailUniqueViolation } from '../../utils/post
 })
 export class DriverRegPage implements OnInit {
   driverRegForm!: FormGroup;
-  currentStep = 1;
+  // currentStep = 1;
+  currentStep: number = 1;
   licensePhotoUrl: string | null = null;
   vehicleRegUrl: string | null = null;
   /** Open stores — driver selects one or more to deliver for */

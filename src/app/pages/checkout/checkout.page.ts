@@ -20,6 +20,7 @@ export class CheckoutPage implements OnInit {
   paymentMethod: 'card' | 'cash' | 'wallet' = 'cash';
   loading = true;
   placingOrder = false;
+  showNewAddress: boolean = false; 
 
   newAddress: Omit<Address, 'id' | 'userId'> = {
     label: 'Home',

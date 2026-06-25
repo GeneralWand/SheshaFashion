@@ -1,176 +1,242 @@
-<ion-header>
-  <ion-toolbar color="primary">
-    <ion-title>Driver Dashboard</ion-title>
+<ion-header class="dash-header">
+  <ion-toolbar color="transparent" class="dash-toolbar">
+    <ion-title class="dash-title">Driver Hub</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="toggleOnlineStatus()">
+      <ion-button (click)="toggleOnlineStatus()" class="dash-status-btn" [class.online]="isOnline">
         <ion-icon [name]="isOnline ? 'radio-button-on' : 'radio-button-off'" slot="start"></ion-icon>
-        {{ isOnline ? 'Online' : 'Offline' }}
+        <span class="dash-status-text">{{ isOnline ? 'Online' : 'Offline' }}</span>
+        <span class="dash-status-dot" [class.online]="isOnline"></span>
       </ion-button>
-      <ion-button>
+      <ion-button class="dash-icon-btn">
         <ion-icon name="notifications-outline"></ion-icon>
+        <span class="dash-badge">3</span>
       </ion-button>
-      <ion-button>
+      <ion-button class="dash-icon-btn">
         <ion-icon name="person-circle-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <!-- Stats row -->
-  <div class="stats-grid">
-    <ion-card class="stat-card">
-      <ion-card-content>
-        <div class="stat-value">{{ stats.totalDeliveries }}</div>
-        <div class="stat-label">Total Deliveries</div>
-      </ion-card-content>
-    </ion-card>
-
-    <ion-card class="stat-card">
-      <ion-card-content>
-        <div class="stat-value">R{{ stats.totalEarnings | number:'1.0-0' }}</div>
-        <div class="stat-label">Total Earnings</div>
-      </ion-card-content>
-    </ion-card>
-
-    <ion-card class="stat-card">
-      <ion-card-content>
-        <div class="stat-value">{{ stats.rating | number:'1.1-1' }} ★</div>
-        <div class="stat-label">Rating</div>
-      </ion-card-content>
-    </ion-card>
-
-    <ion-card class="stat-card stat-card-today">
-      <ion-card-content>
-        <div class="stat-value">R{{ todayEarnings | number:'1.0-0' }}</div>
-        <div class="stat-label">Today's Earnings</div>
-        <div class="stat-sub">{{ completedDeliveriesToday }} today</div>
-      </ion-card-content>
-    </ion-card>
+<ion-content class="driver-dash">
+  <!-- Welcome Banner -->
+  <div class="dash-welcome">
+    <div class="dash-welcome-content">
+      <!-- <h1>Welcome back, <span>{{ driverName || 'Driver' }}</span></h1> -->
+      <p>{{ isOnline ? 'You are online and ready to deliver' : 'Go online to start earning' }}</p>
+    </div>
+    <div class="dash-welcome-stats">
+      <div class="dash-welcome-stat">
+        <span class="dash-welcome-stat-value">{{ stats.totalDeliveries || 0 }}</span>
+        <span class="dash-welcome-stat-label">Deliveries</span>
+      </div>
+      <div class="dash-welcome-stat">
+        <span class="dash-welcome-stat-value">R{{ stats.totalEarnings || 0 | number:'1.0-0' }}</span>
+        <span class="dash-welcome-stat-label">Earnings</span>
+      </div>
+    </div>
   </div>
 
-  <ion-card *ngIf="isOnline && availableOrders.length === 0">
-    <ion-card-content>
-      <p class="ion-text-center ion-color-medium">No new customer orders right now. New checkouts appear as <strong>pending</strong> until you accept.</p>
-    </ion-card-content>
-  </ion-card>
-
-  <ion-card *ngIf="!isOnline">
-    <ion-card-content>
-      <p class="ion-text-center ion-color-medium">Go <strong>Online</strong> to see pending orders waiting for a driver.</p>
-    </ion-card-content>
-  </ion-card>
-
-  <!-- Available Deliveries (pending — accept first, then store is auto-confirmed) -->
-  <ion-card *ngIf="isOnline && availableOrders.length > 0">
-    <ion-card-header>
-      <ion-card-title>Pending Orders — Accept First</ion-card-title>
-      <ion-card-subtitle>{{ availableOrders.length }} awaiting driver · store confirms automatically</ion-card-subtitle>
-    </ion-card-header>
-    <ion-card-content>
-      <div *ngFor="let order of availableOrders" class="order-item">
-        <ion-item lines="full">
-          <ion-thumbnail slot="start">
-            <ion-icon name="fast-food-outline" size="large"></ion-icon>
-          </ion-thumbnail>
-          <ion-label>
-            <h2>{{ order.storeName }}</h2>
-            <p>Distance: {{ order.distance }} km</p>
-            <p>Est. Time: {{ order.estimatedTime }} min</p>
-            <p>Earnings: R{{ order.earnings }}</p>
-          </ion-label>
-          <ion-button (click)="acceptOrder(order)" fill="solid" slot="end">
-            Accept
-          </ion-button>
-        </ion-item>
+  <!-- Stats Grid -->
+  <div class="dash-stats-grid">
+    <div class="dash-stat-card">
+      <div class="dash-stat-icon">
+        <ion-icon name="trophy-outline"></ion-icon>
       </div>
-    </ion-card-content>
-  </ion-card>
+      <div class="dash-stat-info">
+        <span class="dash-stat-value">{{ stats.totalDeliveries || 0 }}</span>
+        <span class="dash-stat-label">Total Deliveries</span>
+      </div>
+    </div>
+
+    <div class="dash-stat-card">
+      <div class="dash-stat-icon earnings">
+        <ion-icon name="cash-outline"></ion-icon>
+      </div>
+      <div class="dash-stat-info">
+        <span class="dash-stat-value">R{{ stats.totalEarnings || 0 | number:'1.0-0' }}</span>
+        <span class="dash-stat-label">Total Earnings</span>
+      </div>
+    </div>
+
+    <div class="dash-stat-card">
+      <div class="dash-stat-icon rating">
+        <ion-icon name="star-outline"></ion-icon>
+      </div>
+      <div class="dash-stat-info">
+        <span class="dash-stat-value">{{ stats.rating || 0 | number:'1.1-1' }}</span>
+        <span class="dash-stat-label">Rating</span>
+      </div>
+    </div>
+
+    <div class="dash-stat-card today">
+      <div class="dash-stat-icon">
+        <ion-icon name="calendar-outline"></ion-icon>
+      </div>
+      <div class="dash-stat-info">
+        <span class="dash-stat-value">R{{ todayEarnings || 0 | number:'1.0-0' }}</span>
+        <span class="dash-stat-label">Today's Earnings</span>
+        <span class="dash-stat-sub">{{ completedDeliveriesToday || 0 }} completed today</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty States -->
+  <div *ngIf="isOnline && availableOrders.length === 0" class="dash-empty-state">
+    <ion-icon name="hourglass-outline" class="dash-empty-icon"></ion-icon>
+    <h3>No pending orders</h3>
+    <p>New customer orders will appear here as they come in</p>
+  </div>
+
+  <div *ngIf="!isOnline" class="dash-empty-state offline">
+    <ion-icon name="wifi-outline" class="dash-empty-icon"></ion-icon>
+    <h3>You are offline</h3>
+    <p>Toggle the online button above to start receiving orders</p>
+  </div>
+
+  <!-- Available Orders -->
+  <div *ngIf="isOnline && availableOrders.length > 0" class="dash-section">
+    <div class="dash-section-header">
+      <h2>Pending Orders</h2>
+      <span class="dash-section-count">{{ availableOrders.length }}</span>
+    </div>
+    
+    <div *ngFor="let order of availableOrders" class="dash-order-card">
+      <div class="dash-order-header">
+        <div class="dash-order-store">
+          <ion-icon name="storefront-outline"></ion-icon>
+          <span>{{ order.storeName }}</span>
+        </div>
+        <div class="dash-order-earnings">
+          <span>R{{ order.earnings }}</span>
+        </div>
+      </div>
+      
+      <div class="dash-order-details">
+        <div class="dash-order-detail">
+          <ion-icon name="location-outline"></ion-icon>
+          <span>{{ order.distance }} km away</span>
+        </div>
+        <div class="dash-order-detail">
+          <ion-icon name="time-outline"></ion-icon>
+          <span>{{ order.estimatedTime }} min</span>
+        </div>
+      </div>
+
+      <ion-button (click)="acceptOrder(order)" class="dash-accept-btn" expand="block">
+        <ion-icon name="checkmark-circle" slot="start"></ion-icon>
+        Accept Order
+      </ion-button>
+    </div>
+  </div>
 
   <!-- Active Deliveries -->
-  <ion-card *ngIf="activeDeliveries.length > 0">
-    <ion-card-header>
-      <ion-card-title>Active Deliveries</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <div *ngFor="let delivery of activeDeliveries" class="delivery-item">
-        <ion-item>
-          <ion-avatar slot="start">
-            <ion-icon name="location-outline"></ion-icon>
-          </ion-avatar>
-          <ion-label>
-            <h2>Order #{{ delivery.orderId }}</h2>
-            <p>Pickup: {{ delivery.pickupLocation }}</p>
-            <p>Delivery: {{ delivery.deliveryLocation }}</p>
-            <p>Status: {{ delivery.status }}</p>
-          </ion-label>
-          <ion-button (click)="viewDeliveryDetails(delivery)" fill="clear" slot="end">
-            <ion-icon name="chevron-forward"></ion-icon>
-          </ion-button>
-        </ion-item>
+  <div *ngIf="activeDeliveries.length > 0" class="dash-section">
+    <div class="dash-section-header">
+      <h2>Active Deliveries</h2>
+      <span class="dash-section-count">{{ activeDeliveries.length }}</span>
+    </div>
 
-        <div class="delivery-progress">
-          <div class="progress-steps">
-            <div class="progress-step" [class.active]="delivery.status === 'assigned' || delivery.status === 'accepted' || delivery.status === 'picked_up' || delivery.status === 'delivered'">
-              <ion-icon name="checkmark-circle"></ion-icon>
-              <span>Assigned</span>
-            </div>
-            <div class="progress-step" [class.active]="delivery.status === 'accepted' || delivery.status === 'picked_up' || delivery.status === 'delivered'">
-              <ion-icon name="car"></ion-icon>
-              <span>Accepted</span>
-            </div>
-            <div class="progress-step" [class.active]="delivery.status === 'picked_up' || delivery.status === 'delivered'">
-              <ion-icon name="cube"></ion-icon>
-              <span>Picked Up</span>
-            </div>
-            <div class="progress-step" [class.active]="delivery.status === 'delivered'">
-              <ion-icon name="flag"></ion-icon>
-              <span>Delivered</span>
-            </div>
+    <div *ngFor="let delivery of activeDeliveries" class="dash-delivery-card">
+      <div class="dash-delivery-header">
+        <div class="dash-delivery-id">
+          <ion-icon name="receipt-outline"></ion-icon>
+          <span>Order #{{ delivery.orderId }}</span>
+        </div>
+        <ion-badge [color]="delivery.status === 'delivered' ? 'success' : 'warning'" class="dash-delivery-badge">
+          {{ delivery.status }}
+        </ion-badge>
+      </div>
+
+      <div class="dash-delivery-locations">
+        <div class="dash-location">
+          <ion-icon name="north-east" class="dash-location-icon pickup"></ion-icon>
+          <div>
+            <span class="dash-location-label">Pickup</span>
+            <span class="dash-location-address">{{ delivery.pickupLocation }}</span>
           </div>
         </div>
-
-        <div class="delivery-actions" *ngIf="delivery.status === 'assigned'">
-          <ion-button expand="block" (click)="acceptDelivery(delivery)" color="success">
-            Accept Delivery
-          </ion-button>
-        </div>
-        <div class="delivery-actions" *ngIf="delivery.status === 'accepted'">
-          <ion-button expand="block" (click)="markAsPickedUp(delivery)" color="primary">
-            Mark as Picked Up
-          </ion-button>
-        </div>
-        <div class="delivery-actions" *ngIf="delivery.status === 'picked_up'">
-          <ion-button expand="block" (click)="markAsDelivered(delivery)" color="success">
-            Mark as Delivered
-          </ion-button>
+        <div class="dash-location">
+          <ion-icon name="location" class="dash-location-icon delivery"></ion-icon>
+          <div>
+            <span class="dash-location-label">Delivery</span>
+            <span class="dash-location-address">{{ delivery.deliveryLocation }}</span>
+          </div>
         </div>
       </div>
-    </ion-card-content>
-  </ion-card>
+
+      <!-- Progress Steps -->
+      <div class="dash-progress">
+        <div class="dash-progress-step" [class.active]="delivery.status === 'assigned' || delivery.status === 'accepted' || delivery.status === 'picked_up' || delivery.status === 'delivered'">
+          <div class="dash-progress-dot"></div>
+          <span>Assigned</span>
+        </div>
+        <div class="dash-progress-line" [class.active]="delivery.status === 'accepted' || delivery.status === 'picked_up' || delivery.status === 'delivered'"></div>
+        <div class="dash-progress-step" [class.active]="delivery.status === 'accepted' || delivery.status === 'picked_up' || delivery.status === 'delivered'">
+          <div class="dash-progress-dot"></div>
+          <span>Accepted</span>
+        </div>
+        <div class="dash-progress-line" [class.active]="delivery.status === 'picked_up' || delivery.status === 'delivered'"></div>
+        <div class="dash-progress-step" [class.active]="delivery.status === 'picked_up' || delivery.status === 'delivered'">
+          <div class="dash-progress-dot"></div>
+          <span>Picked Up</span>
+        </div>
+        <div class="dash-progress-line" [class.active]="delivery.status === 'delivered'"></div>
+        <div class="dash-progress-step" [class.active]="delivery.status === 'delivered'">
+          <div class="dash-progress-dot"></div>
+          <span>Delivered</span>
+        </div>
+      </div>
+
+      <div class="dash-delivery-actions">
+        <ion-button *ngIf="delivery.status === 'assigned'" (click)="acceptDelivery(delivery)" class="dash-action-btn success" expand="block">
+          <ion-icon name="checkmark-circle" slot="start"></ion-icon>
+          Accept Delivery
+        </ion-button>
+        <ion-button *ngIf="delivery.status === 'accepted'" (click)="markAsPickedUp(delivery)" class="dash-action-btn primary" expand="block">
+          <ion-icon name="cube" slot="start"></ion-icon>
+          Mark as Picked Up
+        </ion-button>
+        <ion-button *ngIf="delivery.status === 'picked_up'" (click)="markAsDelivered(delivery)" class="dash-action-btn success" expand="block">
+          <ion-icon name="flag" slot="start"></ion-icon>
+          Mark as Delivered
+        </ion-button>
+      </div>
+    </div>
+  </div>
 
   <!-- Delivery History -->
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>{{ showAllDeliveryHistory ? 'Delivery History' : 'Recent Deliveries' }}</ion-card-title>
-      <ion-button fill="clear" slot="end" (click)="viewAllHistory()">
+  <div class="dash-section">
+    <div class="dash-section-header">
+      <h2>{{ showAllDeliveryHistory ? 'Delivery History' : 'Recent Deliveries' }}</h2>
+      <ion-button fill="clear" (click)="viewAllHistory()" class="dash-view-all-btn">
         {{ showAllDeliveryHistory ? 'Show Less' : 'View All' }}
+        <ion-icon [name]="showAllDeliveryHistory ? 'chevron-up' : 'chevron-forward'" slot="end"></ion-icon>
       </ion-button>
-    </ion-card-header>
-    <ion-card-content>
-      <p *ngIf="deliveryHistory.length === 0" class="ion-text-center ion-color-medium">No completed deliveries yet.</p>
-      <ion-list *ngIf="deliveryHistory.length > 0">
-        <ion-item *ngFor="let history of displayedDeliveryHistory" lines="full">
-          <ion-label>
-            <h3>Order #{{ history.orderId }}</h3>
-            <p>{{ history.storeName }} • {{ history.date | date:'MMM d, h:mm a' }}</p>
-            <p class="earnings">R{{ history.earnings }}</p>
-          </ion-label>
-          <ion-badge [color]="history.status === 'delivered' ? 'success' : 'warning'" slot="end">
-            {{ history.status }}
-          </ion-badge>
-        </ion-item>
-      </ion-list>
-    </ion-card-content>
-  </ion-card>
+    </div>
+
+    <div *ngIf="deliveryHistory.length === 0" class="dash-empty-state small">
+      <ion-icon name="calendar-outline" class="dash-empty-icon"></ion-icon>
+      <p>No completed deliveries yet</p>
+    </div>
+
+    <div *ngFor="let history of displayedDeliveryHistory" class="dash-history-item">
+      <div class="dash-history-left">
+        <div class="dash-history-icon">
+          <ion-icon name="checkmark-circle"></ion-icon>
+        </div>
+        <div class="dash-history-info">
+          <span class="dash-history-order">Order #{{ history.orderId }}</span>
+          <span class="dash-history-store">{{ history.storeName }}</span>
+          <span class="dash-history-date">{{ history.date | date:'MMM d, h:mm a' }}</span>
+        </div>
+      </div>
+      <div class="dash-history-right">
+        <span class="dash-history-earnings">R{{ history.earnings }}</span>
+        <ion-badge [color]="history.status === 'delivered' ? 'success' : 'warning'" class="dash-history-badge">
+          {{ history.status }}
+        </ion-badge>
+      </div>
+    </div>
+  </div>
 </ion-content>

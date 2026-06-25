@@ -498,4 +498,24 @@ export class HomePage implements OnInit {
   goToCart() {
     this.navCtrl.navigateForward('/cart');
   }
+
+  viewAllProducts(){
+
+  }
+
+
+get currentYear(): number {
+  return new Date().getFullYear();
+}
+
+// Add these methods to your HomePage class
+
+goToHome() {
+  this.navCtrl.navigateRoot('/home');
+}
+
+openSearch() {
+  // Open search modal or navigate to search page
+  this.navCtrl.navigateForward('/search');
+}
 }

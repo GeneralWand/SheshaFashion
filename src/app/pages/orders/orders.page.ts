@@ -16,6 +16,7 @@ export class OrdersPage implements OnInit {
   selectedStatus = 'all';
   loading = true;
   readonly placeholderProduct = PLACEHOLDER_PRODUCT_IMG;
+  showFilter: boolean = false;
 
   constructor(
     private orderService: OrderService,

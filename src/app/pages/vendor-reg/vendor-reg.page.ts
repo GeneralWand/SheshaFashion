@@ -36,6 +36,7 @@ export interface VendorRegStoreDraft {
 export class VendorRegPage implements OnInit {
   vendorRegForm!: FormGroup;
   activeSegment: 'account' | 'business' | 'stores' = 'account';
+  activeStep: number = 1;
   stores: VendorRegStoreDraft[] = [];
   businessDocUrl: string | null = null;
 

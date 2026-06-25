@@ -1,335 +1,339 @@
-<ion-header>
-  <ion-toolbar class="mrd-toolbar">
-    <!-- Hamburger -->
-    <ion-buttons slot="start">
-      <ion-menu-button class="menu-btn"></ion-menu-button>
+<ion-header class="home-header">
+  <ion-toolbar class="home-toolbar">
+    <!-- Left: Menu + Brand -->
+    <ion-buttons slot="start" class="home-brand-section">
+      <ion-menu-button class="home-menu-btn"></ion-menu-button>
+      <div class="home-brand" (click)="goToHome()">
+        <ion-icon name="shirt-outline" class="home-brand-icon"></ion-icon>
+        <span class="home-brand-name">Shesha</span>
+        <span class="home-brand-badge">Fashion</span>
+      </div>
     </ion-buttons>
 
-    <!-- Address pill (blue, MrD style) -->
-    <div class="header-address" (click)="changeLocation()">
-      <ion-icon name="location-outline"></ion-icon>
-      <span>{{ currentLocation || 'Enter address' }}</span>
+    <!-- Center: Categories -->
+    <div class="home-header-categories">
+      <div class="home-header-categories-scroll">
+        <div class="home-header-category-item" (click)="filterByCategory({name:'Women',category_id:'women'})">
+          <ion-icon name="woman-outline"></ion-icon>
+          <span>Women</span>
+        </div>
+        <div class="home-header-category-item" (click)="filterByCategory({name:'Men',category_id:'men'})">
+          <ion-icon name="man-outline"></ion-icon>
+          <span>Men</span>
+        </div>
+        <div class="home-header-category-item" (click)="filterByCategory({name:'Kids',category_id:'kids'})">
+          <ion-icon name="people-outline"></ion-icon>
+          <span>Kids</span>
+        </div>
+        <div class="home-header-category-item" (click)="filterByCategory({name:'Accessories',category_id:'accessories'})">
+          <ion-icon name="watch-outline"></ion-icon>
+          <span>Accessories</span>
+        </div>
+        <div class="home-header-category-item" (click)="filterByCategory({name:'Shoes',category_id:'shoes'})">
+          <ion-icon name="footsteps-outline"></ion-icon>
+          <span>Shoes</span>
+        </div>
+        <div class="home-header-category-item" (click)="viewAllStores()">
+          <ion-icon name="grid-outline"></ion-icon>
+          <span>All</span>
+        </div>
+      </div>
     </div>
 
-    <!-- Find my location -->
-    <div class="header-find-loc" (click)="getCurrentLocation()">
-      <ion-icon name="navigate-circle-outline"></ion-icon>
-      <span>Find my location</span>
-    </div>
-
-    <!-- Cart (always visible; separate from header-right which hides on small screens) -->
-    <ion-buttons slot="end" class="header-cart">
-      <ion-button fill="clear" class="header-cart-btn" (click)="goToCart()" aria-label="Shopping cart">
-        <ion-icon slot="icon-only" name="cart-outline"></ion-icon>
-        <ion-badge *ngIf="cartItemCount > 0" color="danger" class="header-cart-badge">{{ cartItemCount > 99 ? '99+' : cartItemCount }}</ion-badge>
+    <!-- Right: Actions -->
+    <ion-buttons slot="end" class="home-header-actions">
+      <!-- Location -->
+      <ion-button fill="clear" class="home-location-btn" (click)="changeLocation()">
+        <ion-icon name="location-outline"></ion-icon>
+        <span class="home-location-text">{{ currentLocation ? currentLocation.split(',')[0] : 'Location' }}</span>
       </ion-button>
-    </ion-buttons>
 
-    <!-- Right side -->
-    <ion-buttons slot="end" class="header-right">
-      <ng-container *ngIf="!isLoggedIn">
-        <ion-button fill="clear" class="create-account-btn" (click)="goToRegister()">
-          Create account
-        </ion-button>
-        <ion-button fill="outline" class="signin-btn" (click)="goToLogin()">
-          Sign in for saved addresses
-        </ion-button>
-      </ng-container>
+      <!-- Search -->
+      <ion-button fill="clear" class="home-search-btn" (click)="openSearch()">
+        <ion-icon name="search-outline"></ion-icon>
+      </ion-button>
 
-      <ng-container *ngIf="isLoggedIn">
-        <ion-button fill="clear" class="create-account-btn" (click)="goToProfile()">
-          {{ profile?.first_name || 'Account' }}
-        </ion-button>
-        <ion-button fill="outline" class="signin-btn" (click)="logout()">
-          Logout
-        </ion-button>
-      </ng-container>
+      <!-- Cart -->
+      <ion-button fill="clear" class="home-cart-btn" (click)="goToCart()">
+        <ion-icon name="cart-outline"></ion-icon>
+        <ion-badge *ngIf="cartItemCount > 0" color="danger" class="home-cart-badge">{{ cartItemCount > 99 ? '99+' : cartItemCount }}</ion-badge>
+      </ion-button>
+
+      <!-- Profile -->
+      <ion-button fill="clear" class="home-profile-btn" (click)="isLoggedIn ? goToProfile() : goToLogin()">
+        <ion-icon [name]="isLoggedIn ? 'person-circle-outline' : 'person-outline'"></ion-icon>
+      </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="mrd-content">
-  <div class="page-layout">
-
-    <!-- ══════════════════════════════════
-         LEFT SIDEBAR NAV
-    ══════════════════════════════════ -->
-    <aside class="sidebar-nav">
-      <div class="nav-item" (click)="viewAllStores()">
-        <div class="nav-icon stores-ico">
-          <ion-icon name="storefront-outline"></ion-icon>
+<ion-content class="home-page">
+  <!-- Hero Banner -->
+  <section class="home-hero">
+    <div class="home-hero-content">
+      <div class="home-hero-text">
+        <span class="home-hero-badge">✨ New Season</span>
+        <h1>Discover <span class="home-hero-highlight">Premium</span> Fashion</h1>
+        <p>Curated collections from the best local and international brands. Free delivery on your first order.</p>
+        <div class="home-hero-buttons">
+          <button class="home-btn-primary" (click)="viewAllStores()">
+            <ion-icon name="bag-outline"></ion-icon>
+            Shop Now
+          </button>
+          <button class="home-btn-secondary" (click)="changeLocation()">
+            <ion-icon name="location-outline"></ion-icon>
+            Set Location
+          </button>
         </div>
-        <span>Stores</span>
-      </div>
-
-      <div class="nav-item" (click)="filterByCategory({name:'Women',category_id:'women'})">
-        <div class="nav-icon women-ico">
-          <ion-icon name="woman-outline"></ion-icon>
-        </div>
-        <span>Women</span>
-      </div>
-
-      <div class="nav-item" (click)="filterByCategory({name:'Men',category_id:'men'})">
-        <div class="nav-icon men-ico">
-          <ion-icon name="man-outline"></ion-icon>
-        </div>
-        <span>Men</span>
-      </div>
-
-      <hr class="nav-div" />
-      <div class="nav-link bold" *ngIf="!isLoggedIn" (click)="goToLogin()">Sign in</div>
-      <div class="nav-link bold" *ngIf="isLoggedIn" (click)="goToProfile()">My profile</div>
-      <hr class="nav-div" />
-
-      <div class="nav-link" (click)="goToVendorReg()">List your store on Shesha</div>
-      <div class="nav-link" (click)="goToDriverReg()">Become a driver</div>
-      <div class="nav-link">Careers</div>
-      <div class="nav-link">Contact us</div>
-      <div class="nav-link">Help</div>
-      <div class="nav-link">FAQ's</div>
-
-      <hr class="nav-div" />
-      <div class="nav-link small">Ideas &amp; Complaints</div>
-      <div class="nav-link small">Responsible Disclosure Policy</div>
-      <div class="nav-link small">Privacy Policy</div>
-      <div class="nav-link small">Terms &amp; Conditions</div>
-      <div class="nav-link small">Human Rights Statement</div>
-      <div class="nav-link small">Speak Up Process</div>
-    </aside>
-
-    <!-- ══════════════════════════════════
-         MAIN CONTENT
-    ══════════════════════════════════ -->
-    <main class="main-content">
-
-      <!-- ── HERO ── -->
-      <section class="hero">
-        <div class="hero-img-wrap">
-          <img src="assets/img/hero-fashion.png" alt="Fashion" />
-        </div>
-        <div class="hero-copy">
-          <h1>Shop fashion from your favourite stores</h1>
-          <p>Get daily deals and free delivery on your first order from over 500 fashion stores, delivered to your door.</p>
-          <div class="hero-btns">
-            <button class="btn-primary" (click)="changeLocation()">
-              <ion-icon name="location-outline"></ion-icon>
-              Enter address
-            </button>
-            <button class="btn-secondary" (click)="getCurrentLocation()">
-              <ion-icon name="navigate-circle-outline"></ion-icon>
-              Use current location
-            </button>
+        <div class="home-hero-stats">
+          <div class="home-stat">
+            <span class="home-stat-number">50+</span>
+            <span class="home-stat-label">Stores</span>
           </div>
-        </div>
-      </section>
-
-      <!-- ── FEATURED STORES CAROUSEL ── -->
-      <section class="content-section" *ngIf="featuredStores.length > 0 || loading">
-        <div class="sec-header">
-          <h2>Shop from the best fashion stores.</h2>
-          <div class="sec-controls">
-            <button class="ctrl-btn"><ion-icon name="chevron-back-outline"></ion-icon></button>
-            <button class="ctrl-btn"><ion-icon name="chevron-forward-outline"></ion-icon></button>
+          <div class="home-stat-divider"></div>
+          <div class="home-stat">
+            <span class="home-stat-number">1000+</span>
+            <span class="home-stat-label">Products</span>
           </div>
-        </div>
-
-        <!-- Skeleton while loading -->
-        <div class="cards-scroll" *ngIf="loading">
-          <div class="store-card skeleton" *ngFor="let i of [1,2,3,4,5]">
-            <div class="card-img-wrap sk-box"></div>
-            <div class="card-body">
-              <div class="sk-line w60"></div>
-              <div class="sk-line w40"></div>
-            </div>
+          <div class="home-stat-divider"></div>
+          <div class="home-stat">
+            <span class="home-stat-number">4.8★</span>
+            <span class="home-stat-label">Rating</span>
           </div>
-        </div>
-
-        <div class="cards-scroll" *ngIf="!loading">
-          <div
-            *ngFor="let store of featuredStores"
-            class="store-card"
-            (click)="goToStore(store.store_id)">
-            <div class="card-img-wrap">
-              <img [src]="store.cover_image_url || placeholderStore" [alt]="store.name" />
-              <div class="card-logo" *ngIf="store.logo_url">
-                <img [src]="store.logo_url" [alt]="store.name" />
-              </div>
-            </div>
-            <div class="card-body">
-              <p class="card-name">{{ store.name }}</p>
-              <button class="shop-now-btn" (click)="goToStore(store.store_id); $event.stopPropagation()">
-                Shop now
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ── CATEGORIES ── -->
-      <!-- <section class="content-section" *ngIf="categories.length > 0">
-        <div class="sec-header">
-          <h2>Popular categories</h2>
-          <div class="sec-controls">
-            <button class="ctrl-btn"><ion-icon name="chevron-back-outline"></ion-icon></button>
-            <button class="ctrl-btn" (click)="viewAllCategories()"><ion-icon name="chevron-forward-outline"></ion-icon></button>
-          </div>
-        </div>
-
-        <div class="cat-scroll">
-          <div
-            *ngFor="let cat of categories"
-            class="cat-item"
-            (click)="filterByCategory(cat)">
-            <div class="cat-icon">
-              <ion-icon [name]="cat.icon || 'grid-outline'"></ion-icon>
-            </div>
-            <span>{{ cat.name }}</span>
-          </div>
-        </div>
-      </section> -->
-
-      <!-- ── POPULAR PRODUCTS (From Different Stores) ── -->
-<section class="content-section" *ngIf="popularProducts.length > 0">
-  <div class="sec-header">
-    <h2>Popular products</h2>
-    <div class="sec-controls">
-      <button class="ctrl-btn" (click)="scrollProductsCarousel('prev')">
-        <ion-icon name="chevron-back-outline"></ion-icon>
-      </button>
-      <button class="ctrl-btn" (click)="scrollProductsCarousel('next')">
-        <ion-icon name="chevron-forward-outline"></ion-icon>
-      </button>
-    </div>
-  </div>
-
-  <div class="products-scroll" #productsScroll>
-    <div
-      *ngFor="let product of popularProducts"
-      class="product-card"
-      (click)="goToProduct(product)">
-      <div class="product-img-wrap">
-        <img [src]="product.images && product.images[0] ? product.images[0] : placeholderProduct" [alt]="product.name" />
-        <div class="product-discount" *ngIf="product.discount_price">
-          -{{((product.price - product.discount_price) / product.price * 100).toFixed(0)}}%
-        </div>
-        <div class="product-store-logo" *ngIf="getStoreForProduct(product)?.logo_url">
-          <img [src]="getStoreForProduct(product)?.logo_url" [alt]="getStoreForProduct(product)?.name" />
         </div>
       </div>
-      <div class="product-body">
-        <p class="product-name">{{ product.name | slice:0:35 }}{{ product.name.length > 35 ? '...' : '' }}</p>
-        <div class="product-store">
-          <ion-icon name="storefront-outline"></ion-icon>
-          <span>{{ getStoreForProduct(product)?.name | slice:0:20 }}</span>
+      <div class="home-hero-image">
+        <img src="assets/img/hero-fashion.png" alt="Fashion" />
+        <div class="home-hero-floating-badge">
+          <ion-icon name="trophy-outline"></ion-icon>
+          <span>Top Rated</span>
         </div>
-        <div class="product-price">
-          <span class="current-price">R{{ (product.discount_price || product.price) | number:'1.2-2' }}</span>
-          <span class="original-price" *ngIf="product.discount_price">R{{ product.price | number:'1.2-2' }}</span>
-        </div>
-        <button class="quick-add-btn" (click)="quickAddToCart(product); $event.stopPropagation()">
-          <ion-icon name="add-outline"></ion-icon>
-          Add
-        </button>
       </div>
     </div>
+  </section>
+
+  <!-- Featured Stores -->
+  <section class="home-section" *ngIf="featuredStores.length > 0">
+    <div class="home-section-header">
+      <div>
+        <h2>Featured Stores</h2>
+        <p>Handpicked fashion destinations</p>
+      </div>
+      <button class="home-see-all" (click)="viewAllStores()">See All <ion-icon name="arrow-forward-outline"></ion-icon></button>
+    </div>
+
+    <div class="home-store-grid">
+      <div *ngFor="let store of featuredStores.slice(0, 4)" class="home-store-card" (click)="goToStore(store.store_id)">
+        <div class="home-store-image">
+          <img [src]="store.cover_image_url || placeholderStore" [alt]="store.name" />
+          <div class="home-store-logo-badge" *ngIf="store.logo_url">
+            <img [src]="store.logo_url" [alt]="store.name" />
+          </div>
+        </div>
+        <div class="home-store-info">
+          <h3>{{ store.name }}</h3>
+          <div class="home-store-meta">
+            <span class="home-store-rating">
+              <ion-icon name="star"></ion-icon>
+              {{ store.rating || 'New' }}
+            </span>
+            <span class="home-store-dot">•</span>
+            <span>{{ store.estimated_delivery_time || '30-45 min' }}</span>
+          </div>
+          <div class="home-store-delivery">
+            <ion-icon name="bicycle-outline"></ion-icon>
+            <span>{{ store.delivery_fee === 0 ? 'Free delivery' : 'R' + store.delivery_fee + ' delivery' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Popular Products -->
+  <section class="home-section home-section-alt" *ngIf="popularProducts.length > 0">
+    <div class="home-section-header">
+      <div>
+        <h2>Trending Now</h2>
+        <p>Most popular items this week</p>
+      </div>
+      <button class="home-see-all" (click)="viewAllProducts()">See All <ion-icon name="arrow-forward-outline"></ion-icon></button>
+    </div>
+
+    <div class="home-product-grid">
+      <div *ngFor="let product of popularProducts.slice(0, 4)" class="home-product-card" (click)="goToProduct(product)">
+        <div class="home-product-image">
+          <img [src]="product.images && product.images[0] ? product.images[0] : placeholderProduct" [alt]="product.name" />
+          <div class="home-product-discount" *ngIf="product.discount_price">
+            -{{((product.price - product.discount_price) / product.price * 100).toFixed(0)}}%
+          </div>
+          <button class="home-product-quick-add" (click)="quickAddToCart(product); $event.stopPropagation()">
+            <ion-icon name="add-outline"></ion-icon>
+          </button>
+        </div>
+        <div class="home-product-info">
+          <h4>{{ product.name | slice:0:30 }}{{ product.name.length > 30 ? '...' : '' }}</h4>
+          <div class="home-product-store-name">
+            <ion-icon name="storefront-outline"></ion-icon>
+            <span>{{ getStoreForProduct(product)?.name | slice:0:20 }}</span>
+          </div>
+          <div class="home-product-pricing">
+            <span class="home-product-current">R{{ (product.discount_price || product.price) | number:'1.2-2' }}</span>
+            <span class="home-product-original" *ngIf="product.discount_price">R{{ product.price | number:'1.2-2' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stores Near You - Horizontal Scroll on Mobile -->
+  <section class="home-section" *ngIf="nearbyStores.length > 0">
+    <div class="home-section-header">
+      <div>
+        <h2>Stores Near You</h2>
+        <p>Discover fashion close to home</p>
+      </div>
+      <button class="home-see-all" (click)="viewAllNearby()">See All <ion-icon name="arrow-forward-outline"></ion-icon></button>
+    </div>
+
+    <div class="home-nearby-scroll">
+      <div *ngFor="let store of nearbyStores" class="home-nearby-scroll-card" (click)="goToStore(store.store_id)">
+        <div class="home-nearby-scroll-image">
+          <img [src]="store.cover_image_url || store.logo_url || placeholderStore" [alt]="store.name" />
+          <div class="home-nearby-scroll-logo" *ngIf="store.logo_url">
+            <img [src]="store.logo_url" [alt]="store.name" />
+          </div>
+          <div class="home-nearby-scroll-distance" *ngIf="store.distance">
+            <ion-icon name="location-outline"></ion-icon>
+            {{ store.distance.toFixed(1) }} km
+          </div>
+        </div>
+        <div class="home-nearby-scroll-info">
+          <h4>{{ store.name }}</h4>
+          <div class="home-nearby-scroll-meta">
+            <span class="home-nearby-scroll-rating">
+              <ion-icon name="star"></ion-icon>
+              {{ store.rating || 'New' }}
+            </span>
+            <span class="home-nearby-scroll-dot">•</span>
+            <span>{{ store.estimated_delivery_time || '30-45 min' }}</span>
+          </div>
+          <div class="home-nearby-scroll-delivery">
+            <ion-icon name="bicycle-outline"></ion-icon>
+            {{ store.delivery_fee === 0 ? 'Free' : 'R' + store.delivery_fee }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Trust & Safety Banner -->
+  <section class="home-trust">
+    <div class="home-trust-grid">
+      <div class="home-trust-item">
+        <ion-icon name="shield-checkmark-outline"></ion-icon>
+        <div>
+          <h4>Secure Payments</h4>
+          <p>256-bit encrypted transactions</p>
+        </div>
+      </div>
+      <div class="home-trust-divider"></div>
+      <div class="home-trust-item">
+        <ion-icon name="time-outline"></ion-icon>
+        <div>
+          <h4>Fast Delivery</h4>
+          <p>Average 30-45 min delivery</p>
+        </div>
+      </div>
+      <div class="home-trust-divider"></div>
+      <div class="home-trust-item">
+        <ion-icon name="headset-outline"></ion-icon>
+        <div>
+          <h4>24/7 Support</h4>
+          <p>Real-time customer service</p>
+        </div>
+      </div>
+      <div class="home-trust-divider"></div>
+      <div class="home-trust-item">
+        <ion-icon name="return-up-back-outline"></ion-icon>
+        <div>
+          <h4>Easy Returns</h4>
+          <p>30-day return policy</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================= -->
+  <!-- FOOTER / SIDEBAR CONTENT AT BOTTOM       -->
+  <!-- ========================================= -->
+  <section class="home-footer">
+    <div class="home-footer-inner">
+      <!-- Quick Links -->
+      <div class="home-footer-column">
+        <h4>Quick Links</h4>
+        <ul>
+          <li (click)="goToLogin()" *ngIf="!isLoggedIn">Sign In</li>
+          <li (click)="goToProfile()" *ngIf="isLoggedIn">My Profile</li>
+          <li (click)="viewAllStores()">Stores</li>
+          <li (click)="viewAllProducts()">Products</li>
+          <li (click)="goToVendorReg()">List your store on Shesha</li>
+          <li (click)="goToDriverReg()">Become a driver</li>
+        </ul>
+      </div>
+
+      <!-- Support -->
+      <div class="home-footer-column">
+        <h4>Support</h4>
+        <ul>
+          <li>Help</li>
+          <li>FAQ's</li>
+          <li>Contact us</li>
+          <li>Careers</li>
+        </ul>
+      </div>
+
+      <!-- Policies -->
+      <div class="home-footer-column">
+        <h4>Policies</h4>
+        <ul>
+          <li>Privacy Policy</li>
+          <li>Terms &amp; Conditions</li>
+          <li>Human Rights Statement</li>
+          <li>Speak Up Process</li>
+          <li>Responsible Disclosure Policy</li>
+        </ul>
+      </div>
+
+      <!-- Ideas & Complaints -->
+      <div class="home-footer-column">
+        <h4>Feedback</h4>
+        <ul>
+          <li>Ideas &amp; Complaints</li>
+          <li>Responsible Disclosure Policy</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="home-footer-bottom">
+      <div class="home-footer-brand">
+        <ion-icon name="shirt-outline"></ion-icon>
+        <span>Shesha Fashion</span>
+      </div>
+      <p>&copy; {{ currentYear }} Shesha Fashion. All rights reserved.</p>
+    </div>
+  </section>
+
+  <!-- Loading -->
+  <div *ngIf="loading && featuredStores.length === 0" class="home-loading">
+    <div class="home-loading-spinner"></div>
+    <p>Discovering fashion for you...</p>
   </div>
-</section>
 
-      <!-- ── PROMOTIONS ── -->
-      <section class="promo-section" *ngIf="promotions.length > 0">
-        <div class="promo-scroll">
-          <div
-            *ngFor="let promo of promotions"
-            class="promo-card"
-            (click)="applyPromotion(promo)">
-            <div class="promo-body">
-              <span class="promo-desc">{{ promo.description || promo.code }}</span>
-              <span class="promo-val" *ngIf="promo.type === 'percentage'">{{ promo.value }}% OFF</span>
-              <span class="promo-val" *ngIf="promo.type === 'fixed'">R{{ promo.value }} OFF</span>
-              <span class="promo-min" *ngIf="promo.min_order">Min order R{{ promo.min_order }}</span>
-            </div>
-            <div class="promo-tag">
-              <ion-icon name="pricetag-outline"></ion-icon>
-              <span>{{ promo.code }}</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ── POPULAR STORES LOGO STRIP ── -->
-      <section class="content-section" *ngIf="featuredStores.length > 0">
-        <div class="sec-header">
-          <h2>Popular stores</h2>
-          <button class="see-all-btn" (click)="viewAllStores()">See all</button>
-          <div class="sec-controls">
-            <button class="ctrl-btn"><ion-icon name="chevron-back-outline"></ion-icon></button>
-            <button class="ctrl-btn"><ion-icon name="chevron-forward-outline"></ion-icon></button>
-          </div>
-        </div>
-
-        <div class="logo-scroll">
-          <div
-            *ngFor="let store of featuredStores"
-            class="logo-item"
-            (click)="goToStore(store.store_id)">
-            <div class="logo-circle">
-              <img [src]="store.logo_url || placeholderStore" [alt]="store.name" />
-            </div>
-            <span>{{ store.name | slice:0:12 }}</span>
-          </div>
-        </div>
-      </section>
-
-      <!-- ── NEARBY STORES ── -->
-      <section class="content-section" *ngIf="nearbyStores.length > 0">
-        <div class="sec-header">
-          <h2>Nearby stores</h2>
-          <button class="see-all-btn" (click)="viewAllNearby()">See all</button>
-        </div>
-
-        <div class="nearby-list">
-          <div
-            *ngFor="let store of nearbyStores"
-            class="nearby-row"
-            (click)="goToStore(store.store_id)">
-            <div class="nearby-thumb">
-              <img [src]="store.logo_url || placeholderStore" [alt]="store.name" />
-            </div>
-            <div class="nearby-info">
-              <h3>{{ store.name }}</h3>
-              <div class="nearby-meta">
-                <ion-icon name="star" class="star-ico"></ion-icon>
-                <span>{{ store.rating || 'New' }}</span>
-                <span class="dot">·</span>
-                <span>{{ store.estimated_delivery_time || '30–45 min' }}</span>
-                <ng-container *ngIf="store.distance">
-                  <span class="dot">·</span>
-                  <span>{{ store.distance.toFixed(1) }} km</span>
-                </ng-container>
-              </div>
-              <p class="nearby-delivery">
-                {{ store.delivery_fee === 0 ? 'Free delivery' : 'R' + store.delivery_fee + ' delivery' }}
-                <span *ngIf="store.min_order"> · Min R{{ store.min_order }}</span>
-              </p>
-            </div>
-            <ion-icon name="chevron-forward-outline" class="row-arrow"></ion-icon>
-          </div>
-        </div>
-      </section>
-
-      <!-- ── LOADING ── -->
-      <div *ngIf="loading && featuredStores.length === 0" class="loading-state">
-        <ion-spinner name="crescent"></ion-spinner>
-      </div>
-
-      <!-- ── EMPTY STATE ── -->
-      <div *ngIf="!loading && featuredStores.length === 0 && nearbyStores.length === 0" class="empty-state">
-        <ion-icon name="storefront-outline"></ion-icon>
-        <h3>No stores available</h3>
-        <p>Change your location to find stores near you</p>
-        <button class="btn-primary" (click)="changeLocation()">Change location</button>
-      </div>
-
-    </main>
+  <!-- Empty -->
+  <div *ngIf="!loading && featuredStores.length === 0 && nearbyStores.length === 0" class="home-empty">
+    <ion-icon name="storefront-outline"></ion-icon>
+    <h3>No stores available</h3>
+    <p>Change your location to find stores near you</p>
+    <button class="home-btn-primary" (click)="changeLocation()">Change Location</button>
   </div>
 </ion-content>

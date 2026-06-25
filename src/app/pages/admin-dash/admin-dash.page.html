@@ -1,321 +1,422 @@
-<ion-header>
-  <ion-toolbar color="primary">
-    <ion-title>Admin Dashboard</ion-title>
+<ion-header class="admin-header">
+  <ion-toolbar color="transparent" class="admin-toolbar">
+    <ion-title class="admin-title">Admin Hub</ion-title>
     <ion-buttons slot="end">
-      <ion-button>
+      <ion-button class="admin-icon-btn">
         <ion-icon name="notifications-outline"></ion-icon>
+        <span class="admin-badge">5</span>
       </ion-button>
-      <ion-button>
+      <ion-button class="admin-icon-btn">
         <ion-icon name="person-circle-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content class="admin-dash">
   <!-- Tabs -->
-  <ion-segment [(ngModel)]="activeTab">
-    <ion-segment-button value="pending">
-      <ion-label>Pending Approvals</ion-label>
-      <ion-badge *ngIf="pendingCount > 0" color="danger">{{ pendingCount }}</ion-badge>
-    </ion-segment-button>
-    <ion-segment-button value="vendors">
-      <ion-label>Vendors</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="drivers">
-      <ion-label>Drivers</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="stores">
-      <ion-label>Stores</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="analytics">
-      <ion-label>Analytics</ion-label>
-    </ion-segment-button>
-  </ion-segment>
+  <div class="admin-tabs-wrapper">
+    <ion-segment [(ngModel)]="activeTab" class="admin-segment">
+      <ion-segment-button value="pending">
+        <ion-label>Pending</ion-label>
+        <ion-badge *ngIf="pendingCount > 0" color="danger" class="admin-segment-badge">{{ pendingCount }}</ion-badge>
+      </ion-segment-button>
+      <ion-segment-button value="vendors">
+        <ion-label>Vendors</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="drivers">
+        <ion-label>Drivers</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="stores">
+        <ion-label>Stores</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="analytics">
+        <ion-label>Analytics</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </div>
 
-  <!-- Pending Approvals Tab -->
-  <div *ngIf="activeTab === 'pending'">
+  <!-- ========================================= -->
+  <!-- PENDING APPROVALS TAB                     -->
+  <!-- ========================================= -->
+  <div *ngIf="activeTab === 'pending'" class="admin-tab-content">
     <!-- Pending Vendors -->
-    <ion-card *ngIf="pendingVendors.length > 0">
-      <ion-card-header>
-        <ion-card-title>Pending Vendor Approvals</ion-card-title>
-        <ion-card-subtitle>{{ pendingVendors.length }} vendors waiting for approval</ion-card-subtitle>
-      </ion-card-header>
-      <ion-card-content>
-        <div *ngFor="let vendor of pendingVendors" class="pending-item">
-          <ion-item lines="full">
-            <ion-avatar slot="start">
-              <ion-icon name="business-outline"></ion-icon>
-            </ion-avatar>
-            <ion-label>
-              <h2>{{ vendor.storeName }}</h2>
-              <p>Email: {{ vendor.businessEmail }}</p>
-              <p>Phone: {{ vendor.businessPhone }}</p>
-              <p>Submitted: {{ vendor.createdDate | date }}</p>
-            </ion-label>
-            <ion-buttons slot="end">
-              <ion-button (click)="viewVendorDetails(vendor)" fill="clear">
-                <ion-icon name="eye"></ion-icon>
-              </ion-button>
-              <ion-button (click)="approveVendor(vendor)" color="success" fill="clear">
-                <ion-icon name="checkmark-circle"></ion-icon>
-              </ion-button>
-              <ion-button (click)="rejectVendor(vendor)" color="danger" fill="clear">
-                <ion-icon name="close-circle"></ion-icon>
-              </ion-button>
-            </ion-buttons>
-          </ion-item>
-        </div>
-      </ion-card-content>
-    </ion-card>
+    <div *ngIf="pendingVendors.length > 0" class="admin-card">
+      <div class="admin-card-header">
+        <h3>Pending Vendor Approvals</h3>
+        <span class="admin-card-count">{{ pendingVendors.length }}</span>
+      </div>
+      <div class="admin-card-body admin-table-wrapper">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Store Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Submitted</th>
+              <th class="admin-table-actions">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let vendor of pendingVendors">
+              <td data-label="Store Name"><strong>{{ vendor.storeName }}</strong></td>
+              <td data-label="Email">{{ vendor.businessEmail }}</td>
+              <td data-label="Phone">{{ vendor.businessPhone }}</td>
+              <td data-label="Submitted">{{ vendor.createdDate | date:'MMM d, yyyy' }}</td>
+              <td data-label="Actions" class="admin-table-actions">
+                <ion-button (click)="viewVendorDetails(vendor)" fill="clear" size="small" class="admin-action-btn view">
+                  <ion-icon name="eye-outline"></ion-icon>
+                </ion-button>
+                <ion-button (click)="approveVendor(vendor)" fill="clear" size="small" class="admin-action-btn approve">
+                  <ion-icon name="checkmark-circle"></ion-icon>
+                </ion-button>
+                <ion-button (click)="rejectVendor(vendor)" fill="clear" size="small" class="admin-action-btn reject">
+                  <ion-icon name="close-circle"></ion-icon>
+                </ion-button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
 
     <!-- Pending Drivers -->
-    <ion-card *ngIf="pendingDrivers.length > 0">
-      <ion-card-header>
-        <ion-card-title>Pending Driver Approvals</ion-card-title>
-        <ion-card-subtitle>{{ pendingDrivers.length }} drivers waiting for approval</ion-card-subtitle>
-      </ion-card-header>
-      <ion-card-content>
-        <div *ngFor="let driver of pendingDrivers" class="pending-item">
-          <ion-item lines="full">
-            <ion-avatar slot="start">
-              <ion-icon name="car-outline"></ion-icon>
-            </ion-avatar>
-            <ion-label>
-              <h2>{{ driver.fullName }}</h2>
-              <p>License: {{ driver.licenseNumber }}</p>
-              <p>Vehicle: {{ driver.vehicleModel }} ({{ driver.vehicleColor }})</p>
-              <p>Plate: {{ driver.plateNumber }}</p>
-            </ion-label>
-            <ion-buttons slot="end">
-              <ion-button (click)="viewDriverDetails(driver)" fill="clear">
-                <ion-icon name="eye"></ion-icon>
-              </ion-button>
-              <ion-button (click)="approveDriver(driver)" color="success" fill="clear">
-                <ion-icon name="checkmark-circle"></ion-icon>
-              </ion-button>
-              <ion-button (click)="rejectDriver(driver)" color="danger" fill="clear">
-                <ion-icon name="close-circle"></ion-icon>
-              </ion-button>
-            </ion-buttons>
-          </ion-item>
-        </div>
-      </ion-card-content>
-    </ion-card>
+    <div *ngIf="pendingDrivers.length > 0" class="admin-card">
+      <div class="admin-card-header">
+        <h3>Pending Driver Approvals</h3>
+        <span class="admin-card-count">{{ pendingDrivers.length }}</span>
+      </div>
+      <div class="admin-card-body admin-table-wrapper">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Full Name</th>
+              <th>License #</th>
+              <th>Vehicle</th>
+              <th>Plate</th>
+              <th class="admin-table-actions">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let driver of pendingDrivers">
+              <td data-label="Full Name"><strong>{{ driver.fullName }}</strong></td>
+              <td data-label="License #">{{ driver.licenseNumber }}</td>
+              <td data-label="Vehicle">{{ driver.vehicleModel }} ({{ driver.vehicleColor }})</td>
+              <td data-label="Plate">{{ driver.plateNumber }}</td>
+              <td data-label="Actions" class="admin-table-actions">
+                <ion-button (click)="viewDriverDetails(driver)" fill="clear" size="small" class="admin-action-btn view">
+                  <ion-icon name="eye-outline"></ion-icon>
+                </ion-button>
+                <ion-button (click)="approveDriver(driver)" fill="clear" size="small" class="admin-action-btn approve">
+                  <ion-icon name="checkmark-circle"></ion-icon>
+                </ion-button>
+                <ion-button (click)="rejectDriver(driver)" fill="clear" size="small" class="admin-action-btn reject">
+                  <ion-icon name="close-circle"></ion-icon>
+                </ion-button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div *ngIf="pendingVendors.length === 0 && pendingDrivers.length === 0" class="admin-empty-state">
+      <ion-icon name="checkmark-circle-outline" class="admin-empty-icon"></ion-icon>
+      <h3>All clear!</h3>
+      <p>No pending approvals at this time</p>
+    </div>
   </div>
 
-  <!-- Vendors Tab -->
-  <div *ngIf="activeTab === 'vendors'">
-    <ion-searchbar [(ngModel)]="vendorSearchTerm" placeholder="Search vendors..." (ionInput)="filterVendors()"></ion-searchbar>
+  <!-- ========================================= -->
+  <!-- VENDORS TAB                              -->
+  <!-- ========================================= -->
+  <div *ngIf="activeTab === 'vendors'" class="admin-tab-content">
+    <div class="admin-search-wrapper">
+      <ion-searchbar [(ngModel)]="vendorSearchTerm" placeholder="Search vendors..." (ionInput)="filterVendors()" class="admin-searchbar"></ion-searchbar>
+    </div>
     
-    <ion-card *ngFor="let vendor of filteredVendors">
-      <ion-card-header>
-        <ion-card-title>{{ vendor.storeName }}</ion-card-title>
-        <ion-card-subtitle>Status: {{ vendor.isApproved ? 'Approved' : 'Pending' }}</ion-card-subtitle>
-        <ion-buttons slot="end">
-          <ion-button (click)="toggleVendorStatus(vendor)" [color]="vendor.isApproved ? 'danger' : 'success'">
-            <ion-icon [name]="vendor.isApproved ? 'close-circle' : 'checkmark-circle'"></ion-icon>
-            {{ vendor.isApproved ? 'Deactivate' : 'Activate' }}
-          </ion-button>
-        </ion-buttons>
-      </ion-card-header>
-      <ion-card-content>
-        <ion-grid>
-          <ion-row>
-            <ion-col size="6">
-              <p><strong>Email:</strong> {{ vendor.businessEmail }}</p>
-              <p><strong>Phone:</strong> {{ vendor.businessPhone }}</p>
-              <p><strong>Address:</strong> {{ vendor.businessAddress }}</p>
-            </ion-col>
-            <ion-col size="6">
-              <p><strong>Total Sales:</strong> R{{ vendor.totalSales || 0 }}</p>
-              <p><strong>Rating:</strong> {{ vendor.rating || 0 }} ★</p>
-              <p><strong>Commission Rate:</strong> {{ vendor.commissionRate }}%</p>
-            </ion-col>
-          </ion-row>
-        </ion-grid>
+    <div class="admin-card">
+      <div class="admin-card-header">
+        <h3>All Vendors</h3>
+        <span class="admin-card-count">{{ filteredVendors.length }}</span>
+      </div>
+      <div class="admin-card-body admin-table-wrapper">
+        <table class="admin-table admin-table-expandable">
+          <thead>
+            <tr>
+              <th>Store Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Sales</th>
+              <th>Rating</th>
+              <th>Status</th>
+              <th class="admin-table-actions">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let vendor of filteredVendors">
+              <tr class="admin-table-row" [class.expanded]="expandedVendor === vendor.vendorId">
+                <td data-label="Store Name"><strong>{{ vendor.storeName }}</strong></td>
+                <td data-label="Email">{{ vendor.businessEmail }}</td>
+                <td data-label="Phone">{{ vendor.businessPhone }}</td>
+                <td data-label="Sales">R{{ vendor.totalSales || 0 }}</td>
+                <td data-label="Rating">{{ vendor.rating || 0 }}★</td>
+                <td data-label="Status">
+                  <span class="admin-status-badge" [class.approved]="vendor.isApproved" [class.pending]="!vendor.isApproved">
+                    {{ vendor.isApproved ? 'Approved' : 'Pending' }}
+                  </span>
+                </td>
+                <td data-label="Actions" class="admin-table-actions">
+                  <ion-button (click)="toggleVendorStores(vendor)" fill="clear" size="small" class="admin-action-btn">
+                    <ion-icon [name]="expandedVendor === vendor.vendorId ? 'chevron-up' : 'chevron-down'"></ion-icon>
+                  </ion-button>
+                  <ion-button (click)="toggleVendorStatus(vendor)" fill="clear" size="small" class="admin-action-btn" [class.active]="vendor.isApproved">
+                    <ion-icon [name]="vendor.isApproved ? 'pause-circle' : 'play-circle'"></ion-icon>
+                  </ion-button>
+                </td>
+              </tr>
+              <!-- Expanded Store Details -->
+              <tr *ngIf="expandedVendor === vendor.vendorId" class="admin-expand-row">
+                <td colspan="7">
+                  <div class="admin-expand-content">
+                    <div class="admin-expand-header">
+                      <span class="admin-expand-title">Stores ({{ vendor.stores?.length || 0 }})</span>
+                    </div>
+                    <table class="admin-sub-table">
+                      <thead>
+                        <tr>
+                          <th>Store Name</th>
+                          <th>Category</th>
+                          <th>Delivery Fee</th>
+                          <th>Min Order</th>
+                          <th>Rating</th>
+                          <th>Status</th>
+                          <th>Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let store of vendor.stores || []">
+                          <td data-label="Store Name">{{ store.name }}</td>
+                          <td data-label="Category">{{ store.category }}</td>
+                          <td data-label="Delivery Fee">R{{ store.deliveryFee }}</td>
+                          <td data-label="Min Order">R{{ store.minOrder }}</td>
+                          <td data-label="Rating">{{ store.rating || 0 }}★</td>
+                          <td data-label="Status">
+                            <span class="admin-status-badge" [class.open]="store.status === 'open'" [class.closed]="store.status !== 'open'">
+                              {{ store.status }}
+                            </span>
+                          </td>
+                          <td data-label="Action">
+                            <ion-button (click)="toggleStoreStatus(store)" size="small" class="admin-sub-toggle-btn" [color]="store.status === 'open' ? 'warning' : 'success'">
+                              {{ store.status === 'open' ? 'Close' : 'Open' }}
+                            </ion-button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 
-        <!-- Stores under this vendor -->
-        <div class="vendor-stores">
-          <ion-item lines="none">
-            <ion-label>
-              <h3>Stores ({{ vendor.stores?.length || 0 }})</h3>
-            </ion-label>
-            <ion-button (click)="toggleVendorStores(vendor)" fill="clear" slot="end">
-              {{ expandedVendor === vendor.vendorId ? 'Hide' : 'View Stores' }}
-              <ion-icon [name]="expandedVendor === vendor.vendorId ? 'chevron-up' : 'chevron-down'"></ion-icon>
-            </ion-button>
-          </ion-item>
-          
-          <div *ngIf="expandedVendor === vendor.vendorId" class="store-list">
-            <ion-card *ngFor="let store of vendor.stores" class="store-card-mini">
-              <ion-card-header>
-                <ion-card-title>{{ store.name }}</ion-card-title>
-                <ion-badge [color]="store.status === 'open' ? 'success' : 'danger'">{{ store.status }}</ion-badge>
-              </ion-card-header>
-              <ion-card-content>
-                <p><strong>Category:</strong> {{ store.category }}</p>
-                <p><strong>Delivery Fee:</strong> R{{ store.deliveryFee }}</p>
-                <p><strong>Min Order:</strong> R{{ store.minOrder }}</p>
-                <p><strong>Rating:</strong> {{ store.rating || 0 }} ★</p>
-                <ion-button (click)="toggleStoreStatus(store)" size="small" [color]="store.status === 'open' ? 'warning' : 'success'">
-                  {{ store.status === 'open' ? 'Close Store' : 'Open Store' }}
+  <!-- ========================================= -->
+  <!-- DRIVERS TAB                              -->
+  <!-- ========================================= -->
+  <div *ngIf="activeTab === 'drivers'" class="admin-tab-content">
+    <div class="admin-search-wrapper">
+      <ion-searchbar [(ngModel)]="driverSearchTerm" placeholder="Search drivers..." (ionInput)="filterDrivers()" class="admin-searchbar"></ion-searchbar>
+    </div>
+    
+    <div class="admin-card">
+      <div class="admin-card-header">
+        <h3>All Drivers</h3>
+        <span class="admin-card-count">{{ filteredDrivers.length }}</span>
+      </div>
+      <div class="admin-card-body admin-table-wrapper">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Driver</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Vehicle</th>
+              <th>Plate</th>
+              <th>Deliveries</th>
+              <th>Earnings</th>
+              <th>Rating</th>
+              <th>Status</th>
+              <th class="admin-table-actions">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let driver of filteredDrivers">
+              <td data-label="Driver"><strong>{{ driver.fullName }}</strong></td>
+              <td data-label="Email">{{ driver.email }}</td>
+              <td data-label="Phone">{{ driver.phone }}</td>
+              <td data-label="Vehicle">{{ driver.vehicleModel }}</td>
+              <td data-label="Plate">{{ driver.plateNumber }}</td>
+              <td data-label="Deliveries">{{ driver.totalDeliveries || 0 }}</td>
+              <td data-label="Earnings">R{{ driver.totalEarnings || 0 }}</td>
+              <td data-label="Rating">{{ driver.rating || 0 }}★</td>
+              <td data-label="Status">
+                <span class="admin-status-badge" [class.approved]="driver.isApproved" [class.pending]="!driver.isApproved">
+                  {{ driver.isApproved ? 'Approved' : 'Pending' }}
+                </span>
+                <span class="admin-status-badge online" [class.online]="driver.isOnline" [class.offline]="!driver.isOnline">
+                  {{ driver.isOnline ? 'Online' : 'Offline' }}
+                </span>
+              </td>
+              <td data-label="Actions" class="admin-table-actions">
+                <ion-button (click)="viewDriverDocuments(driver)" fill="clear" size="small" class="admin-action-btn view">
+                  <ion-icon name="document-text-outline"></ion-icon>
                 </ion-button>
-              </ion-card-content>
-            </ion-card>
+                <ion-button (click)="toggleDriverApproval(driver)" fill="clear" size="small" class="admin-action-btn" [class.active]="driver.isApproved">
+                  <ion-icon [name]="driver.isApproved ? 'pause-circle' : 'checkmark-circle'"></ion-icon>
+                </ion-button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================= -->
+  <!-- STORES TAB                               -->
+  <!-- ========================================= -->
+  <div *ngIf="activeTab === 'stores'" class="admin-tab-content">
+    <div class="admin-search-wrapper">
+      <ion-searchbar [(ngModel)]="storeSearchTerm" placeholder="Search stores..." (ionInput)="filterStores()" class="admin-searchbar"></ion-searchbar>
+    </div>
+    
+    <div class="admin-card">
+      <div class="admin-card-header">
+        <h3>All Stores</h3>
+        <span class="admin-card-count">{{ filteredStores.length }}</span>
+      </div>
+      <div class="admin-card-body admin-table-wrapper">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Store Name</th>
+              <th>Vendor</th>
+              <th>Category</th>
+              <th>Delivery Fee</th>
+              <th>Min Order</th>
+              <th>Rating</th>
+              <th>Status</th>
+              <th class="admin-table-actions">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let store of filteredStores">
+              <td data-label="Store Name"><strong>{{ store.name }}</strong></td>
+              <td data-label="Vendor">{{ store.vendorName }}</td>
+              <td data-label="Category">{{ store.category }}</td>
+              <td data-label="Delivery Fee">R{{ store.deliveryFee }}</td>
+              <td data-label="Min Order">R{{ store.minOrder }}</td>
+              <td data-label="Rating">{{ store.rating || 0 }}★ ({{ store.reviewCount || 0 }})</td>
+              <td data-label="Status">
+                <span class="admin-status-badge" [class.open]="store.status === 'open'" [class.closed]="store.status !== 'open'">
+                  {{ store.status }}
+                </span>
+              </td>
+              <td data-label="Actions" class="admin-table-actions">
+                <ion-button (click)="viewStoreDetails(store)" fill="clear" size="small" class="admin-action-btn view">
+                  <ion-icon name="eye-outline"></ion-icon>
+                </ion-button>
+                <ion-button (click)="toggleStoreStatus(store)" fill="clear" size="small" class="admin-action-btn" [class.active]="store.status === 'open'">
+                  <ion-icon [name]="store.status === 'open' ? 'pause-circle' : 'play-circle'"></ion-icon>
+                </ion-button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================= -->
+  <!-- ANALYTICS TAB                            -->
+  <!-- ========================================= -->
+  <div *ngIf="activeTab === 'analytics'" class="admin-tab-content">
+    <!-- Stats Cards -->
+    <div class="admin-stats-grid">
+      <div class="admin-stat-card">
+        <div class="admin-stat-card-icon">
+          <ion-icon name="cart-outline"></ion-icon>
+        </div>
+        <div class="admin-stat-card-info">
+          <span class="admin-stat-card-value">{{ totalOrders }}</span>
+          <span class="admin-stat-card-label">Total Orders</span>
+        </div>
+      </div>
+      <div class="admin-stat-card">
+        <div class="admin-stat-card-icon revenue">
+          <ion-icon name="cash-outline"></ion-icon>
+        </div>
+        <div class="admin-stat-card-info">
+          <span class="admin-stat-card-value">R{{ totalRevenue }}</span>
+          <span class="admin-stat-card-label">Total Revenue</span>
+        </div>
+      </div>
+      <div class="admin-stat-card">
+        <div class="admin-stat-card-icon users">
+          <ion-icon name="people-outline"></ion-icon>
+        </div>
+        <div class="admin-stat-card-info">
+          <span class="admin-stat-card-value">{{ activeUsers }}</span>
+          <span class="admin-stat-card-label">Active Users</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="admin-charts-grid">
+      <div class="admin-card">
+        <div class="admin-card-header">
+          <h3>Revenue Overview</h3>
+        </div>
+        <div class="admin-card-body">
+          <canvas #revenueChart class="admin-chart"></canvas>
+        </div>
+      </div>
+      <div class="admin-card">
+        <div class="admin-card-header">
+          <h3>Order Statistics</h3>
+        </div>
+        <div class="admin-card-body">
+          <canvas #orderChart class="admin-chart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="admin-card">
+      <div class="admin-card-header">
+        <h3>Recent Activity</h3>
+      </div>
+      <div class="admin-card-body">
+        <div *ngFor="let activity of recentActivities" class="admin-activity-item">
+          <div class="admin-activity-icon">
+            <ion-icon [name]="activity.icon"></ion-icon>
+          </div>
+          <div class="admin-activity-info">
+            <div class="admin-activity-title">{{ activity.title }}</div>
+            <div class="admin-activity-desc">{{ activity.description }}</div>
+            <div class="admin-activity-time">{{ activity.timestamp | date:'MMM d, h:mm a' }}</div>
           </div>
         </div>
-      </ion-card-content>
-    </ion-card>
-  </div>
-
-  <!-- Drivers Tab -->
-  <div *ngIf="activeTab === 'drivers'">
-    <ion-searchbar [(ngModel)]="driverSearchTerm" placeholder="Search drivers..." (ionInput)="filterDrivers()"></ion-searchbar>
-    
-    <ion-grid>
-      <ion-row>
-        <ion-col size="12" size-md="6" *ngFor="let driver of filteredDrivers">
-          <ion-card>
-            <ion-card-header>
-              <ion-card-title>{{ driver.fullName }}</ion-card-title>
-              <ion-card-subtitle>Status: {{ driver.isApproved ? 'Approved' : 'Pending' }}</ion-card-subtitle>
-              <ion-badge [color]="driver.isOnline ? 'success' : 'danger'" slot="end">
-                {{ driver.isOnline ? 'Online' : 'Offline' }}
-              </ion-badge>
-            </ion-card-header>
-            <ion-card-content>
-              <p><strong>Email:</strong> {{ driver.email }}</p>
-              <p><strong>Phone:</strong> {{ driver.phone }}</p>
-              <p><strong>Vehicle:</strong> {{ driver.vehicleModel }} ({{ driver.vehicleColor }})</p>
-              <p><strong>License Plate:</strong> {{ driver.plateNumber }}</p>
-              <p><strong>Total Deliveries:</strong> {{ driver.totalDeliveries || 0 }}</p>
-              <p><strong>Total Earnings:</strong> R{{ driver.totalEarnings || 0 }}</p>
-              <p><strong>Rating:</strong> {{ driver.rating || 0 }} ★</p>
-              
-              <div class="driver-actions">
-                <ion-button (click)="viewDriverDocuments(driver)" size="small" fill="outline">
-                  <ion-icon name="document"></ion-icon>
-                  View Documents
-                </ion-button>
-                <ion-button (click)="toggleDriverApproval(driver)" size="small" [color]="driver.isApproved ? 'danger' : 'success'">
-                  {{ driver.isApproved ? 'Suspend' : 'Approve' }}
-                </ion-button>
-              </div>
-            </ion-card-content>
-          </ion-card>
-        </ion-col>
-      </ion-row>
-    </ion-grid>
-  </div>
-
-  <!-- Stores Tab -->
-  <div *ngIf="activeTab === 'stores'">
-    <ion-searchbar [(ngModel)]="storeSearchTerm" placeholder="Search stores..." (ionInput)="filterStores()"></ion-searchbar>
-    
-    <ion-grid>
-      <ion-row>
-        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let store of filteredStores">
-          <ion-card>
-            <ion-card-header>
-              <ion-card-title>{{ store.name }}</ion-card-title>
-              <ion-card-subtitle>{{ store.category }}</ion-card-subtitle>
-              <ion-badge [color]="store.status === 'open' ? 'success' : 'danger'" slot="end">
-                {{ store.status }}
-              </ion-badge>
-            </ion-card-header>
-            <ion-card-content>
-              <p><strong>Vendor:</strong> {{ store.vendorName }}</p>
-              <p><strong>Address:</strong> {{ store.address }}</p>
-              <p><strong>Delivery Fee:</strong> R{{ store.deliveryFee }}</p>
-              <p><strong>Min Order:</strong> R{{ store.minOrder }}</p>
-              <p><strong>Rating:</strong> {{ store.rating || 0 }} ★ ({{ store.reviewCount || 0 }} reviews)</p>
-              <p><strong>Est. Delivery:</strong> {{ store.estimatedDeliveryTime }}</p>
-              
-              <ion-button expand="block" (click)="viewStoreDetails(store)" fill="outline" size="small">
-                Manage Store
-              </ion-button>
-            </ion-card-content>
-          </ion-card>
-        </ion-col>
-      </ion-row>
-    </ion-grid>
-  </div>
-
-  <!-- Analytics Tab -->
-  <div *ngIf="activeTab === 'analytics'">
-    <ion-grid>
-      <ion-row>
-        <ion-col size="12" size-md="6">
-          <ion-card>
-            <ion-card-header>
-              <ion-card-title>Revenue Overview</ion-card-title>
-            </ion-card-header>
-            <ion-card-content>
-              <canvas #revenueChart></canvas>
-            </ion-card-content>
-          </ion-card>
-        </ion-col>
-        <ion-col size="12" size-md="6">
-          <ion-card>
-            <ion-card-header>
-              <ion-card-title>Order Statistics</ion-card-title>
-            </ion-card-header>
-            <ion-card-content>
-              <canvas #orderChart></canvas>
-            </ion-card-content>
-          </ion-card>
-        </ion-col>
-      </ion-row>
-      
-      <ion-row>
-        <ion-col size="12" size-md="4">
-          <ion-card class="stats-card">
-            <ion-card-content>
-              <div class="stats-number">{{ totalOrders }}</div>
-              <div class="stats-label">Total Orders</div>
-            </ion-card-content>
-          </ion-card>
-        </ion-col>
-        <ion-col size="12" size-md="4">
-          <ion-card class="stats-card">
-            <ion-card-content>
-              <div class="stats-number">R{{ totalRevenue }}</div>
-              <div class="stats-label">Total Revenue</div>
-            </ion-card-content>
-          </ion-card>
-        </ion-col>
-        <ion-col size="12" size-md="4">
-          <ion-card class="stats-card">
-            <ion-card-content>
-              <div class="stats-number">{{ activeUsers }}</div>
-              <div class="stats-label">Active Users</div>
-            </ion-card-content>
-          </ion-card>
-        </ion-col>
-      </ion-row>
-      
-      <ion-row>
-        <ion-col size="12">
-          <ion-card>
-            <ion-card-header>
-              <ion-card-title>Recent Activity</ion-card-title>
-            </ion-card-header>
-            <ion-card-content>
-              <ion-list>
-                <ion-item *ngFor="let activity of recentActivities">
-                  <ion-icon [name]="activity.icon" slot="start"></ion-icon>
-                  <ion-label>
-                    <h3>{{ activity.title }}</h3>
-                    <p>{{ activity.description }}</p>
-                    <p class="activity-time">{{ activity.timestamp | date:'MMM d, h:mm a' }}</p>
-                  </ion-label>
-                </ion-item>
-              </ion-list>
-            </ion-card-content>
-          </ion-card>
-        </ion-col>
-      </ion-row>
-    </ion-grid>
+        <div *ngIf="recentActivities.length === 0" class="admin-empty-state small">
+          <ion-icon name="activity-outline"></ion-icon>
+          <p>No recent activity</p>
+        </div>
+      </div>
+    </div>
   </div>
 </ion-content>

@@ -1,207 +1,287 @@
-<ion-header>
-  <ion-toolbar color="primary">
+
+<ion-header class="vendor-reg-header">
+  <ion-toolbar color="transparent" class="vendor-reg-toolbar">
     <ion-buttons slot="start">
-      <ion-back-button></ion-back-button>
+      <ion-back-button defaultHref="/" class="vendor-reg-back"></ion-back-button>
     </ion-buttons>
-    <ion-title>Register as Vendor</ion-title>
+    <ion-title class="vendor-reg-title">Vendor Portal</ion-title>
+    <ion-buttons slot="end">
+      <ion-chip class="vendor-reg-step-chip">Step {{ activeStep }}/3</ion-chip>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
-  <form [formGroup]="vendorRegForm" (ngSubmit)="registerVendor()">
-    <!-- Tabs -->
-    <ion-segment [(ngModel)]="activeSegment" [ngModelOptions]="{standalone: true}">
-      <ion-segment-button value="account">
-        <ion-label>Account</ion-label>
-      </ion-segment-button>
-      <ion-segment-button value="business">
-        <ion-label>Business</ion-label>
-      </ion-segment-button>
-      <ion-segment-button value="stores">
-        <ion-label>Stores</ion-label>
-      </ion-segment-button>
-    </ion-segment>
-
-    <!-- Account Information -->
-    <div *ngIf="activeSegment === 'account'">
-      <ion-card>
-        <ion-card-header>
-          <ion-card-title>Account Information</ion-card-title>
-        </ion-card-header>
-        <ion-card-content>
-          <ion-item>
-            <ion-label position="floating">Full Name *</ion-label>
-            <ion-input formControlName="fullName" type="text"></ion-input>
-          </ion-item>
-
-          <ion-item>
-            <ion-label position="floating">Email Address *</ion-label>
-            <ion-input formControlName="email" type="email"></ion-input>
-          </ion-item>
-
-          <ion-item>
-            <ion-label position="floating">Phone Number *</ion-label>
-            <ion-input formControlName="phone" type="tel"></ion-input>
-          </ion-item>
-
-          <ion-item>
-            <ion-label position="floating">Password *</ion-label>
-            <ion-input formControlName="password" type="password"></ion-input>
-          </ion-item>
-
-          <ion-item>
-            <ion-label position="floating">Confirm Password *</ion-label>
-            <ion-input formControlName="confirmPassword" type="password"></ion-input>
-          </ion-item>
-        </ion-card-content>
-      </ion-card>
+<ion-content class="ion-no-padding vendor-reg">
+  <!-- HERO SECTION WITH PROGRESS -->
+  <div class="vendor-reg-hero">
+    <div class="vendor-reg-hero-content">
+      <h1>Launch Your <span>Store</span></h1>
+      <p>Join our marketplace and start selling in minutes</p>
     </div>
+    <div class="vendor-reg-progress">
+      <div class="vendor-reg-progress-bar">
+        <div class="vendor-reg-progress-fill" [style.width.%]="(activeStep / 3) * 100"></div>
+      </div>
+      <div class="vendor-reg-progress-steps">
+        <span [class.active]="activeStep >= 1">Account</span>
+        <span [class.active]="activeStep >= 2">Business</span>
+        <span [class.active]="activeStep >= 3">Stores</span>
+      </div>
+    </div>
+  </div>
 
-    <!-- Business Information -->
-    <div *ngIf="activeSegment === 'business'">
-      <ion-card>
-        <ion-card-header>
-          <ion-card-title>Business Information</ion-card-title>
-        </ion-card-header>
-        <ion-card-content>
-          <ion-item>
-            <ion-label position="floating">Store/Business Name *</ion-label>
-            <ion-input formControlName="storeName" type="text"></ion-input>
-          </ion-item>
+  <form [formGroup]="vendorRegForm" (ngSubmit)="registerVendor()" class="vendor-reg-form">
+    <div class="vendor-reg-container">
+      
+      <!-- ========================================= -->
+      <!-- STEP 1: ACCOUNT                          -->
+      <!-- ========================================= -->
+      <div *ngIf="activeStep === 1" class="vendor-reg-step">
+        <div class="vendor-reg-step-header">
+          <div class="vendor-reg-step-icon">1</div>
+          <div>
+            <h2>Account Setup</h2>
+            <p>Create your vendor credentials</p>
+          </div>
+        </div>
 
-          <ion-item>
-            <ion-label position="floating">Business Email *</ion-label>
-            <ion-input formControlName="businessEmail" type="email"></ion-input>
-          </ion-item>
+        <div class="vendor-reg-grid">
+          <div class="vendor-reg-grid-2">
+            <ion-item lines="none" class="vendor-reg-field">
+              <ion-label position="floating">Full Name *</ion-label>
+              <ion-input formControlName="fullName" type="text"></ion-input>
+              <ion-icon name="person-outline" slot="start" class="vendor-reg-input-icon"></ion-icon>
+            </ion-item>
 
-          <ion-item>
-            <ion-label position="floating">Business Phone *</ion-label>
-            <ion-input formControlName="businessPhone" type="tel"></ion-input>
-          </ion-item>
+            <ion-item lines="none" class="vendor-reg-field">
+              <ion-label position="floating">Email Address *</ion-label>
+              <ion-input formControlName="email" type="email"></ion-input>
+              <ion-icon name="mail-outline" slot="start" class="vendor-reg-input-icon"></ion-icon>
+            </ion-item>
 
-          <ion-item>
-            <ion-label position="floating">Business Address *</ion-label>
-            <ion-textarea formControlName="businessAddress" rows="3"></ion-textarea>
-          </ion-item>
+            <ion-item lines="none" class="vendor-reg-field">
+              <ion-label position="floating">Phone Number *</ion-label>
+              <ion-input formControlName="phone" type="tel"></ion-input>
+              <ion-icon name="call-outline" slot="start" class="vendor-reg-input-icon"></ion-icon>
+            </ion-item>
 
-          <ion-item>
-            <ion-label position="floating">Tax ID (Optional)</ion-label>
-            <ion-input formControlName="taxId" type="text"></ion-input>
-          </ion-item>
+            <ion-item lines="none" class="vendor-reg-field">
+              <ion-label position="floating">Password *</ion-label>
+              <ion-input formControlName="password" type="password"></ion-input>
+              <ion-icon name="lock-closed-outline" slot="start" class="vendor-reg-input-icon"></ion-icon>
+            </ion-item>
 
-          <ion-item>
-            <ion-label>Business Registration Document</ion-label>
-            <ion-button (click)="uploadBusinessDoc()" expand="block" fill="outline">
-              <ion-icon name="document" slot="start"></ion-icon>
-              Upload Document
-            </ion-button>
-          </ion-item>
-          <div *ngIf="businessDocUrl" class="document-preview">
-            <img *ngIf="businessDocUrl.startsWith('data:image')" [src]="businessDocUrl" alt="Business document">
-            <ion-note *ngIf="businessDocUrl.startsWith('data:application/pdf')" color="medium">PDF document attached.</ion-note>
-            <div *ngIf="!businessDocUrl.startsWith('data:image') && !businessDocUrl.startsWith('data:application/pdf')" class="doc-fallback">
-              <ion-icon name="document-text"></ion-icon>
-              <span>Document attached</span>
+            <ion-item lines="none" class="vendor-reg-field">
+              <ion-label position="floating">Confirm Password *</ion-label>
+              <ion-input formControlName="confirmPassword" type="password"></ion-input>
+              <ion-icon name="lock-open-outline" slot="start" class="vendor-reg-input-icon"></ion-icon>
+            </ion-item>
+          </div>
+
+          <div class="vendor-reg-side-note">
+            <div class="vendor-reg-note-card">
+              <ion-icon name="shield-checkmark-outline" class="vendor-reg-note-icon"></ion-icon>
+              <h4>Secure & Verified</h4>
+              <p>Your data is encrypted and protected. We never share your information.</p>
+              <div class="vendor-reg-feature-list">
+                <div><ion-icon name="checkmark-circle"></ion-icon> Two-factor authentication</div>
+                <div><ion-icon name="checkmark-circle"></ion-icon> End-to-end encryption</div>
+                <div><ion-icon name="checkmark-circle"></ion-icon> GDPR compliant</div>
+              </div>
             </div>
           </div>
-        </ion-card-content>
-      </ion-card>
-    </div>
+        </div>
 
-    <!-- Store Management -->
-    <div *ngIf="activeSegment === 'stores'">
-      <ion-card>
-        <ion-card-header>
-          <ion-card-title>Your Stores</ion-card-title>
-          <ion-card-subtitle>Add at least one store to get started</ion-card-subtitle>
-        </ion-card-header>
-        <ion-card-content>
-          <div *ngFor="let store of stores; let i = index" class="store-item">
-            <ion-card class="store-card">
-              <ion-card-header>
-                <ion-card-title>Store {{ i + 1 }}</ion-card-title>
-                <ion-buttons slot="end">
-                  <ion-button color="danger" (click)="removeStore(i)">
-                    <ion-icon name="trash"></ion-icon>
-                  </ion-button>
-                </ion-buttons>
-              </ion-card-header>
-              <ion-card-content>
-                <ion-item>
-                  <ion-label position="floating">Store Name *</ion-label>
-                  <ion-input [(ngModel)]="store.name" [ngModelOptions]="{standalone: true}" type="text"></ion-input>
-                </ion-item>
+        <div class="vendor-reg-step-actions">
+          <ion-button expand="block" (click)="activeStep = 2" class="vendor-reg-next-btn">
+            Continue
+            <ion-icon name="arrow-forward" slot="end"></ion-icon>
+          </ion-button>
+        </div>
+      </div>
 
-                <ion-item>
-                  <ion-label position="floating">Store Description</ion-label>
-                  <ion-textarea [(ngModel)]="store.description" [ngModelOptions]="{standalone: true}" rows="2"></ion-textarea>
-                </ion-item>
+      <!-- ========================================= -->
+      <!-- STEP 2: BUSINESS                         -->
+      <!-- ========================================= -->
+      <div *ngIf="activeStep === 2" class="vendor-reg-step">
+        <div class="vendor-reg-step-header">
+          <div class="vendor-reg-step-icon">2</div>
+          <div>
+            <h2>Business Details</h2>
+            <p>Tell us about your company</p>
+          </div>
+        </div>
 
-                <ion-item>
-                  <ion-label position="floating">Street Address *</ion-label>
-                  <ion-input [(ngModel)]="store.address" [ngModelOptions]="{standalone: true}" type="text"></ion-input>
-                </ion-item>
+        <div class="vendor-reg-grid">
+          <div class="vendor-reg-grid-2">
+            <ion-item lines="none" class="vendor-reg-field">
+              <ion-label position="floating">Store/Business Name *</ion-label>
+              <ion-input formControlName="storeName" type="text"></ion-input>
+              <ion-icon name="storefront-outline" slot="start" class="vendor-reg-input-icon"></ion-icon>
+            </ion-item>
 
-                <div class="location-picker">
-                  <ion-button expand="block" fill="outline" (click)="pickStoreLocation(i)">
-                    <ion-icon name="location" slot="start"></ion-icon>
-                    Pick Location on Map
-                  </ion-button>
-                  <div *ngIf="store.location" class="location-info">
-                    <ion-icon name="checkmark-circle"></ion-icon>
-                    Location selected
-                  </div>
-                </div>
+            <ion-item lines="none" class="vendor-reg-field">
+              <ion-label position="floating">Business Email *</ion-label>
+              <ion-input formControlName="businessEmail" type="email"></ion-input>
+              <ion-icon name="mail-outline" slot="start" class="vendor-reg-input-icon"></ion-icon>
+            </ion-item>
 
-                <ion-item>
-                  <ion-label position="floating">Delivery Fee (R)</ion-label>
-                  <ion-input [(ngModel)]="store.deliveryFee" [ngModelOptions]="{standalone: true}" type="number"></ion-input>
-                </ion-item>
+            <ion-item lines="none" class="vendor-reg-field">
+              <ion-label position="floating">Business Phone *</ion-label>
+              <ion-input formControlName="businessPhone" type="tel"></ion-input>
+              <ion-icon name="call-outline" slot="start" class="vendor-reg-input-icon"></ion-icon>
+            </ion-item>
 
-                <ion-item>
-                  <ion-label position="floating">Minimum Order (R)</ion-label>
-                  <ion-input [(ngModel)]="store.minOrder" [ngModelOptions]="{standalone: true}" type="number"></ion-input>
-                </ion-item>
+            <ion-item lines="none" class="vendor-reg-field vendor-reg-full">
+              <ion-label position="floating">Business Address *</ion-label>
+              <ion-textarea formControlName="businessAddress" rows="3"></ion-textarea>
+              <ion-icon name="location-outline" slot="start" class="vendor-reg-input-icon"></ion-icon>
+            </ion-item>
 
-                <ion-item>
-                  <ion-label>Store Logo</ion-label>
-                  <ion-button (click)="uploadStoreLogo(i)" expand="block" fill="outline">
-                    <ion-icon name="image" slot="start"></ion-icon>
-                    Upload Logo
-                  </ion-button>
-                </ion-item>
-                <div *ngIf="store.logoUrl" class="logo-preview ion-padding-start ion-padding-end ion-padding-bottom">
-                  <img *ngIf="store.logoUrl.startsWith('data:image')" [src]="store.logoUrl" alt="Store logo preview">
-                </div>
-              </ion-card-content>
-            </ion-card>
+            <ion-item lines="none" class="vendor-reg-field">
+              <ion-label position="floating">Tax ID (Optional)</ion-label>
+              <ion-input formControlName="taxId" type="text"></ion-input>
+              <ion-icon name="document-text-outline" slot="start" class="vendor-reg-input-icon"></ion-icon>
+            </ion-item>
           </div>
 
-          <ion-button expand="block" fill="clear" (click)="addStore()">
-            <ion-icon name="add-circle" slot="start"></ion-icon>
-            Add Another Store
+          <div class="vendor-reg-side-note">
+            <div class="vendor-reg-upload-zone" (click)="uploadBusinessDoc()">
+              <ion-icon name="cloud-upload-outline" class="vendor-reg-upload-icon"></ion-icon>
+              <h4>Upload Registration</h4>
+              <p>Drop your business registration document here or click to browse</p>
+              <div *ngIf="businessDocUrl" class="vendor-reg-upload-status">
+                <ion-icon name="checkmark-circle" color="success"></ion-icon>
+                <span>Document attached</span>
+              </div>
+              <div class="vendor-reg-upload-formats">PDF, PNG, JPG (max 5MB)</div>
+            </div>
+
+            <div class="vendor-reg-tip">
+              <ion-icon name="bulb-outline"></ion-icon>
+              <div>
+                <strong>Pro Tip</strong>
+                <p>Having your business registration ready speeds up the approval process.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="vendor-reg-step-actions">
+          <ion-button fill="clear" (click)="activeStep = 1" class="vendor-reg-back-btn">
+            <ion-icon name="arrow-back" slot="start"></ion-icon>
+            Back
           </ion-button>
-        </ion-card-content>
-      </ion-card>
+          <ion-button expand="block" (click)="activeStep = 3" class="vendor-reg-next-btn">
+            Continue
+            <ion-icon name="arrow-forward" slot="end"></ion-icon>
+          </ion-button>
+        </div>
+      </div>
 
-      <ion-card>
-        <ion-card-header>
-          <ion-card-title>Terms & Conditions</ion-card-title>
-        </ion-card-header>
-        <ion-card-content>
-          <ion-item>
-            <ion-label class="ion-text-wrap">I agree to the vendor terms and conditions, including the commission rate of 10% on all sales</ion-label>
-            <ion-checkbox formControlName="termsAccepted" slot="start"></ion-checkbox>
+      <!-- ========================================= -->
+      <!-- STEP 3: STORES                           -->
+      <!-- ========================================= -->
+      <div *ngIf="activeStep === 3" class="vendor-reg-step">
+        <div class="vendor-reg-step-header">
+          <div class="vendor-reg-step-icon">3</div>
+          <div>
+            <h2>Your Storefronts</h2>
+            <p>Add at least one store to start selling</p>
+          </div>
+        </div>
+
+        <!-- Store Cards -->
+        <div *ngFor="let store of stores; let i = index" class="vendor-reg-store-card">
+          <div class="vendor-reg-store-header">
+            <div class="vendor-reg-store-badge">Store {{ i + 1 }}</div>
+            <ion-button fill="clear" color="danger" (click)="removeStore(i)" class="vendor-reg-remove-store">
+              <ion-icon name="trash-outline"></ion-icon>
+            </ion-button>
+          </div>
+
+          <div class="vendor-reg-store-grid">
+            <ion-item lines="none" class="vendor-reg-field">
+              <ion-label position="floating">Store Name *</ion-label>
+              <ion-input [(ngModel)]="store.name" [ngModelOptions]="{standalone: true}" type="text"></ion-input>
+              <ion-icon name="storefront-outline" slot="start" class="vendor-reg-input-icon"></ion-icon>
+            </ion-item>
+
+            <ion-item lines="none" class="vendor-reg-field">
+              <ion-label position="floating">Description</ion-label>
+              <ion-textarea [(ngModel)]="store.description" [ngModelOptions]="{standalone: true}" rows="2"></ion-textarea>
+              <ion-icon name="document-outline" slot="start" class="vendor-reg-input-icon"></ion-icon>
+            </ion-item>
+
+            <ion-item lines="none" class="vendor-reg-field vendor-reg-full">
+              <ion-label position="floating">Street Address *</ion-label>
+              <ion-input [(ngModel)]="store.address" [ngModelOptions]="{standalone: true}" type="text"></ion-input>
+              <ion-icon name="location-outline" slot="start" class="vendor-reg-input-icon"></ion-icon>
+            </ion-item>
+
+            <div class="vendor-reg-store-actions">
+              <ion-button fill="outline" (click)="pickStoreLocation(i)" class="vendor-reg-location-btn">
+                <ion-icon name="map-outline" slot="start"></ion-icon>
+                {{ store.location ? 'Update Location' : 'Pick Location' }}
+              </ion-button>
+              <div *ngIf="store.location" class="vendor-reg-location-confirm">
+                <ion-icon name="checkmark-circle" color="success"></ion-icon>
+                <span>Location set</span>
+              </div>
+            </div>
+
+            <div class="vendor-reg-store-pricing">
+              <ion-item lines="none" class="vendor-reg-field vendor-reg-half">
+                <ion-label position="floating">Delivery Fee (R)</ion-label>
+                <ion-input [(ngModel)]="store.deliveryFee" [ngModelOptions]="{standalone: true}" type="number"></ion-input>
+              </ion-item>
+
+              <ion-item lines="none" class="vendor-reg-field vendor-reg-half">
+                <ion-label position="floating">Min. Order (R)</ion-label>
+                <ion-input [(ngModel)]="store.minOrder" [ngModelOptions]="{standalone: true}" type="number"></ion-input>
+              </ion-item>
+            </div>
+
+            <div class="vendor-reg-store-logo">
+              <ion-button fill="outline" (click)="uploadStoreLogo(i)" class="vendor-reg-logo-btn">
+                <ion-icon name="image-outline" slot="start"></ion-icon>
+                Upload Logo
+              </ion-button>
+              <div *ngIf="store.logoUrl" class="vendor-reg-logo-preview">
+                <img *ngIf="store.logoUrl.startsWith('data:image')" [src]="store.logoUrl" alt="Store logo">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Add Store -->
+        <ion-button fill="clear" (click)="addStore()" class="vendor-reg-add-store-btn">
+          <ion-icon name="add-circle-outline" slot="start"></ion-icon>
+          Add Another Store
+        </ion-button>
+
+        <!-- Terms -->
+        <div class="vendor-reg-terms-card">
+          <ion-item lines="none" class="vendor-reg-field">
+            <ion-checkbox formControlName="termsAccepted" slot="start" color="danger"></ion-checkbox>
+            <ion-label class="ion-text-wrap">
+              I agree to the <strong>vendor terms</strong> and <strong>10% commission</strong> on all sales
+            </ion-label>
           </ion-item>
-        </ion-card-content>
-      </ion-card>
-    </div>
+        </div>
 
-    <div class="submit-button">
-      <ion-button type="submit" expand="block" [disabled]="!vendorRegForm.valid || stores.length === 0">
-        Submit Vendor Application
-        <ion-icon name="send" slot="end"></ion-icon>
-      </ion-button>
+        <div class="vendor-reg-step-actions">
+          <ion-button fill="clear" (click)="activeStep = 2" class="vendor-reg-back-btn">
+            <ion-icon name="arrow-back" slot="start"></ion-icon>
+            Back
+          </ion-button>
+          <ion-button type="submit" expand="block" [disabled]="!vendorRegForm.valid || stores.length === 0" class="vendor-reg-submit-btn">
+            Launch Store
+            <ion-icon name="rocket" slot="end"></ion-icon>
+          </ion-button>
+        </div>
+      </div>
+
     </div>
   </form>
 </ion-content>

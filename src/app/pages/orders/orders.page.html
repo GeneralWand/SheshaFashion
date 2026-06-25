@@ -1,76 +1,92 @@
-<ion-header>
-  <ion-toolbar color="dark">
+<ion-header class="orders-header">
+  <ion-toolbar color="transparent" class="orders-toolbar">
     <ion-buttons slot="start">
-      <ion-back-button></ion-back-button>
+      <ion-back-button class="orders-back-btn"></ion-back-button>
     </ion-buttons>
-    <ion-title>My Orders</ion-title>
+    <ion-title class="orders-title">My Orders</ion-title>
+    <ion-buttons slot="end">
+      <ion-button class="orders-filter-btn" (click)="showFilter = !showFilter">
+        <ion-icon name="options-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content class="orders-page">
   <!-- Tabs -->
-  <ion-segment [(ngModel)]="selectedStatus" (ionChange)="filterOrders()">
-    <ion-segment-button value="all">
-      <ion-label>All</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="pending">
-      <ion-label>Pending</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="processing">
-      <ion-label>Processing</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="shipped">
-      <ion-label>Shipped</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="delivered">
-      <ion-label>Delivered</ion-label>
-    </ion-segment-button>
-  </ion-segment>
+  <div class="orders-tabs-wrapper">
+    <ion-segment [(ngModel)]="selectedStatus" (ionChange)="filterOrders()" class="orders-segment">
+      <ion-segment-button value="all">
+        <ion-label>All</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="pending">
+        <ion-label>Pending</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="processing">
+        <ion-label>Processing</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="shipped">
+        <ion-label>Shipped</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="delivered">
+        <ion-label>Delivered</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </div>
 
   <!-- Loading -->
-  <div *ngIf="loading" class="loading-spinner">
-    <ion-spinner name="crescent"></ion-spinner>
+  <div *ngIf="loading" class="orders-loading">
+    <div class="orders-loading-spinner">
+      <ion-spinner name="crescent"></ion-spinner>
+    </div>
+    <p>Loading your orders...</p>
   </div>
 
   <!-- Orders List -->
-  <div *ngIf="!loading && filteredOrders.length === 0" class="empty-state">
-    <ion-icon name="bag-outline"></ion-icon>
+  <div *ngIf="!loading && filteredOrders.length === 0" class="orders-empty">
+    <div class="orders-empty-icon">
+      <ion-icon name="bag-outline"></ion-icon>
+    </div>
     <h3>No Orders Found</h3>
     <p>You haven't placed any orders yet</p>
-    <ion-button color="danger" (click)="goToHome()">Start Shopping</ion-button>
+    <ion-button color="danger" (click)="goToHome()" class="orders-empty-btn">
+      <ion-icon name="storefront-outline" slot="start"></ion-icon>
+      Start Shopping
+    </ion-button>
   </div>
 
   <div *ngIf="!loading && filteredOrders.length > 0" class="orders-list">
-    <div *ngFor="let order of filteredOrders" class="order-card" (click)="goToOrderDetail(order.id)">
-      <div class="order-header">
+    <div *ngFor="let order of filteredOrders" class="orders-card" (click)="goToOrderDetail(order.id)">
+      <div class="orders-card-header">
         <div>
-          <p class="order-id">Order #{{order.id.slice(-8)}}</p>
-          <p class="order-date">{{order.createdAt | date:'medium'}}</p>
+          <p class="orders-id">Order #{{order.id.slice(-8)}}</p>
+          <p class="orders-date">{{order.createdAt | date:'MMM d, yyyy • h:mm a'}}</p>
         </div>
-        <div class="order-status" [class]="order.status">
+        <div class="orders-status" [class]="order.status">
           {{order.status | uppercase}}
         </div>
       </div>
 
-      <div class="order-items">
-        <div *ngFor="let item of order.items.slice(0, 2)" class="order-item-preview">
+      <div class="orders-items">
+        <div *ngFor="let item of order.items.slice(0, 2)" class="orders-item-preview">
           <img [src]="item.product?.images?.length ? item.product.images[0] : placeholderProduct" [alt]="item.product?.name || 'Product'">
-          <div class="item-info">
-            <p class="item-name">{{item.product?.name || 'Product'}}</p>
-            <p class="item-quantity">Qty: {{item.quantity}}</p>
+          <div class="orders-item-info">
+            <p class="orders-item-name">{{item.product?.name || 'Product'}}</p>
+            <p class="orders-item-qty">Qty: {{item.quantity}}</p>
           </div>
         </div>
-        <div *ngIf="order.items.length > 2" class="more-items">
+        <div *ngIf="order.items.length > 2" class="orders-more-items">
           +{{order.items.length - 2}} more items
         </div>
       </div>
 
-      <div class="order-footer">
-        <div class="order-total">
+      <div class="orders-card-footer">
+        <div class="orders-total">
           <span>Total:</span>
           <strong>{{order.total | currency}}</strong>
         </div>
-        <ion-button fill="clear" color="danger" size="small" (click)="trackOrder($event, order.id)">
+        <ion-button fill="clear" color="danger" size="small" (click)="trackOrder($event, order.id)" class="orders-track-btn">
+          <ion-icon name="location-outline" slot="start"></ion-icon>
           Track Order
         </ion-button>
       </div>
